@@ -26,7 +26,7 @@
     {
       "name": "University of New Brunswick, Canada",
       "position": "Research Scholar",
-      "url": "https://example.com",
+      "url": "https://www.unb.ca/fredericton/engineering/depts/gge/index.html",
       "startDate": "2023-05-12",
       "endDate": "2023-07-29",
       "summary": "Developed a efficient deep-learning based solution to enhance both 10-m and 20-m Sentinel-2 bands to 5-m resolution using a single deep learning framework"
@@ -35,7 +35,6 @@
   "education": [
     {
       "institution": "Indian Institute of Technology Kanpur",
-      "location": "UP, India",
       "url": "https://www.iitk.ac.in/",
       "area": "Civil Engineering",
       "studyType": "PhD",
