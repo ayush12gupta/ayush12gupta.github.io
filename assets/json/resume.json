@@ -29,8 +29,7 @@
       "url": "https://example.com",
       "startDate": "2023-05-12",
       "endDate": "2023-07-29",
-      "summary": "Developed a efficient deep-learning based solution to enhance both 10-m and 20-m Sentinel-2 bands to 5-m resolution using a single deep learning framework",
-      "highlights": ["Relativity"]
+      "summary": "Developed a efficient deep-learning based solution to enhance both 10-m and 20-m Sentinel-2 bands to 5-m resolution using a single deep learning framework"
     }
   ],
   "education": [
@@ -40,9 +39,8 @@
       "url": "https://www.iitk.ac.in/",
       "area": "Civil Engineering",
       "studyType": "PhD",
-      "startDate": "2024-05-01",
-      "endDate": "2019-08-01",
-      "courses": ["Theory of Relativity"]
+      "startDate": "May 2024",
+      "endDate": "Aug 2019"
     }
   ],
   "awards": [
