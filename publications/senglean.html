@@ -24,8 +24,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-  <title>Academic Project Page</title>
-  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <title>SenGLEAN</title>
+  <!-- <link rel="icon" type="image/x-icon" href="static/images/favicon.ico"> -->
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
   rel="stylesheet">
 
@@ -52,21 +52,21 @@
       <div class="container is-max-desktop">
         <div class="columns is-centered">
           <div class="column has-text-centered">
-            <h1 class="title is-1 publication-title">Academic Project Page</h1>
+            <h1 class="title is-1 publication-title">SenGLEAN: An End-to-End Deep Learning Approach for Super-Resolution of Sentinel-2 Multi-Resolution Multispectral Images</h1>
             <div class="is-size-5 publication-authors">
               <!-- Paper authors -->
               <span class="author-block">
-                <a href="FIRST AUTHOR PERSONAL LINK" target="_blank">First Author</a><sup>*</sup>,</span>
+                <a href="FIRST AUTHOR PERSONAL LINK" target="_blank">Ayush Gupta</a>,</span>
                 <span class="author-block">
-                  <a href="SECOND AUTHOR PERSONAL LINK" target="_blank">Second Author</a><sup>*</sup>,</span>
+                  <a href="SECOND AUTHOR PERSONAL LINK" target="_blank">Rakesh Mishra</a>,</span>
                   <span class="author-block">
-                    <a href="THIRD AUTHOR PERSONAL LINK" target="_blank">Third Author</a>
+                    <a href="THIRD AUTHOR PERSONAL LINK" target="_blank">Yun Zhang</a>
                   </span>
                   </div>
 
                   <div class="is-size-5 publication-authors">
                     <span class="author-block">Institution Name<br>Conferance name and year</span>
-                    <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span>
+                    <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
                   </div>
 
                   <div class="column has-text-centered">
@@ -124,11 +124,10 @@
 
 
 <!-- Teaser video-->
-<section class="hero teaser">
+<!-- <section class="hero teaser">
   <div class="container is-max-desktop">
     <div class="hero-body">
       <video poster="" id="tree" autoplay controls muted loop height="100%">
-        <!-- Your video here -->
         <source src="static/videos/banner_video.mp4"
         type="video/mp4">
       </video>
@@ -137,7 +136,7 @@
       </h2>
     </div>
   </div>
-</section>
+</section> -->
 <!-- End teaser video -->
 
 <!-- Paper abstract -->
@@ -148,7 +147,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ullamcorper tellus sed ante aliquam tempus. Etiam porttitor urna feugiat nibh elementum, et tempor dolor mattis. Donec accumsan enim augue, a vulputate nisi sodales sit amet. Proin bibendum ex eget mauris cursus euismod nec et nibh. Maecenas ac gravida ante, nec cursus dui. Vivamus purus nibh, placerat ac purus eget, sagittis vestibulum metus. Sed vestibulum bibendum lectus gravida commodo. Pellentesque auctor leo vitae sagittis suscipit.
+            Sentinel-2 data is highly valuable in remote sensing applications owing to its open accessibility and comprehensive spatial-temporal coverage. However, it poses a unique challenge due to its varying spatial resolutions across its different spectral bands (ranging from 10-m to 60-m). High-resolution data offers finer details and significantly enhances the accuracy of analyses, benefiting a wide range of fields. The majority of current methods for enhancing Sentinel-2 image resolution do not address the enhancement of all bands through a unified network. To address this issue, we propose a novel deep learning-based solution named SenGLEAN, for enhancing multi-resolution bands (specifically, 10-m and 20-m Ground Sampling Distance - GSD) to a unified 5-m GSD. SenGLEAN leverages the concept of Generative LatEnt bANks (GLEAN) and employs a multi-resolution encoder-bank-decoder architecture to achieve high-resolution remote sensing imagery. Notably, our model incorporates channel-attention (CA) and pixel-attention modules (PA) within its design to enhance the spatial quality of results. Through quantitative comparison, we demonstrate that our network shows significant improvements, by increasing the PSNR by 0.28 dB for 10-m bands and 2.92 dB for 20-m bands while reducing the RMSE by 3.11 for 10-m bands and 52.26 for 20-m bands. Furthermore, we introduce a lightweight variant, LightSenGLEAN, retaining critical components while reducing total parameters by 81.89%, which still offers competitive performance. In summary, our proposed model provides an efficient solution to enhance both 10-m and 20-m Sentinel-2 bands to 5-m resolution using a single deep learning framework, facilitating precise image analysis and geoscience applications.
           </p>
         </div>
       </div>
@@ -156,6 +155,21 @@
   </div>
 </section>
 <!-- End paper abstract -->
+
+
+<!--=================Applications==========================-->
+<div class="section" ,="" id="results">
+  <h2>Results</h2>
+  <!--=================*******==========================-->
+  <h3>1. Large Factor Super-Resolution</h3>
+  <div id="vid4" class="container">
+      <div class="leftView">
+        <div class="mask" style="width:70px;height:70px"></div>
+        <img class="small" src="./static/images/comp_plot_senglean.png">
+      </div>
+  </div>
+  <br>
+</div>
 
 
 <!-- Image carousel -->
@@ -201,49 +215,44 @@
 
 
 <!-- Youtube video -->
-<section class="hero is-small is-light">
+<!-- <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
-      <!-- Paper video. -->
       <h2 class="title is-3">Video Presentation</h2>
       <div class="columns is-centered has-text-centered">
         <div class="column is-four-fifths">
           
           <div class="publication-video">
-            <!-- Youtube embed code here -->
             <iframe src="https://www.youtube.com/embed/JkaxUblCGz0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
           </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+</section> -->
 <!-- End youtube video -->
 
 
 <!-- Video carousel -->
-<section class="hero is-small">
+<!-- <section class="hero is-small">
   <div class="hero-body">
     <div class="container">
       <h2 class="title is-3">Another Carousel</h2>
       <div id="results-carousel" class="carousel results-carousel">
         <div class="item item-video1">
           <video poster="" id="video1" autoplay controls muted loop height="100%">
-            <!-- Your video file here -->
             <source src="static/videos/carousel1.mp4"
             type="video/mp4">
           </video>
         </div>
         <div class="item item-video2">
           <video poster="" id="video2" autoplay controls muted loop height="100%">
-            <!-- Your video file here -->
             <source src="static/videos/carousel2.mp4"
             type="video/mp4">
           </video>
         </div>
         <div class="item item-video3">
           <video poster="" id="video3" autoplay controls muted loop height="100%">\
-            <!-- Your video file here -->
             <source src="static/videos/carousel3.mp4"
             type="video/mp4">
           </video>
@@ -251,7 +260,7 @@
       </div>
     </div>
   </div>
-</section>
+</section> -->
 <!-- End video carousel -->
 
 
@@ -260,7 +269,7 @@
 
 
 <!-- Paper poster -->
-<section class="hero is-small is-light">
+<!-- <section class="hero is-small is-light">
   <div class="hero-body">
     <div class="container">
       <h2 class="title">Poster</h2>
@@ -270,7 +279,7 @@
         
       </div>
     </div>
-  </section>
+  </section> -->
 <!--End paper poster -->
 
 
@@ -278,7 +287,13 @@
   <section class="section" id="BibTeX">
     <div class="container is-max-desktop content">
       <h2 class="title">BibTeX</h2>
-      <pre><code>BibTex Code Here</code></pre>
+      <pre><code>"@article{Gupta2024senglean,
+        author    = {Gupta, Ayush and Mishra, Rakesh and Zhang, Yun},
+        journal   = {IEEE Transactions on Geoscience and Remote Sensing}, 
+        title     = {SenGLEAN: An End-to-End Deep Learning Approach for Super-Resolution of Sentinel-2 Multi-Resolution Multispectral Images}, 
+        year      = {2024},
+        doi       = {10.1109/TGRS.2024.3374575}
+      }"</code></pre>
     </div>
 </section>
 <!--End BibTex citation -->

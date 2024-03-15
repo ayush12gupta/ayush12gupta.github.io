@@ -43,9 +43,9 @@
     <!-- Title -->
     {% if entry.website %}
       {% if entry.website contains '://' %}
-        <div class="title"><a href="{{ entry.website }}" role="button">{{ entry.title }}</a></div>
+        <div class="title"><a href="{{ entry.website }}" target="_blank" role="button">{{ entry.title }}</a></div>
       {% else %}
-        <div class="title"><a href="{{ entry.website | prepend: '/publications/' | relative_url }}" role="button">{{ entry.title }}</a></div>
+        <div class="title"><a href="{{ entry.website | prepend: '/publications/' | relative_url }}" target="_blank" role="button">{{ entry.title }}</a></div>
       {% endif %}
     {% else %}
       <div class="title">{{ entry.title }}</div>
