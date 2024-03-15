@@ -8,7 +8,10 @@ profile:
   image: prof_pic.jpg
   image_circular: false # crops the image to make it circular
   more_info: >
-    <p>gupta101a12@gmail.com</p>
+    <p>
+      "Email: "
+      <a href="mailto:gupta101a12@gmail.com">gupta101a12 [at] gmail.com</a>
+    </p>
   #   <p>123 your address street</p>
   #   <p>Your City, State 12345</p>
 
