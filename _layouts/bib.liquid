@@ -42,7 +42,7 @@
   <div id="{{entry.key}}" class="{% if site.enable_publication_thumbnails %}col-sm-8{% else %}col-sm-10{% endif %}">
     <!-- Title -->
     {% if entry.website %}
-      {% if entry.html contains '://' %}
+      {% if entry.website contains '://' %}
         <div class="title"><a href="{{ entry.website }}" role="button">{{ entry.title }}</a></div>
       {% else %}
           <a href="{{ entry.website | prepend: '/publications/' | relative_url }}" role="button">{{ entry.title }}</a></div>
