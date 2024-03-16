@@ -42,9 +42,15 @@
           <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem; font-style: italic">{{ content.area }}</h6>
           {% if content.advisor %}
               <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem">
-                <b>Advisor(s)</b>
+                <b>Advisor(s):</b>
                 &nbsp; 
-                <i> {{ content.advisor }} </i>
+                {% if content.advisor %}
+                  <a href="{{ content.advisor_site }}">
+                    <i> {{ content.advisor }} </i>
+                  </a>
+                {% else %}
+                  <i> {{ content.advisor }} </i>
+                {% endif %}
               </span>
           {% endif %}
           <ul class="items">
