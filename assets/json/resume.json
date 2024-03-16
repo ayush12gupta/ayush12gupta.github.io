@@ -29,9 +29,25 @@
       "startDate": "May 2023",
       "endDate": "July 2023",
       "summary": "Developed a efficient deep-learning based solution to enhance both 10-m and 20-m Sentinel-2 bands to 5-m resolution using a single deep learning framework"
+    },
+    {
+      "name": "Munich RE, Indian",
+      "position": "Research Intern",
+      "url": "https://www.munichre.com/en/risks/agricultural-risks.html",
+      "startDate": "Feb 2021",
+      "endDate": "May 2021",
+      "summary": "Built a ConvLSTM-based regression model for predicting the field-level crop loss using time series of Optical and SAR data throughout the season"
     }
   ],
   "education": [
+    {
+      "institution": "Indian Institute of Technology Kanpur",
+      "url": "https://www.iitk.ac.in/",
+      "area": "Civil Engineering",
+      "studyType": "B.Tech.",
+      "startDate": "May 2024",
+      "endDate": "Aug 2019"
+    },
     {
       "institution": "Indian Institute of Technology Kanpur",
       "url": "https://www.iitk.ac.in/",
@@ -41,14 +57,6 @@
       "endDate": "Aug 2019",
       "advisor": "Dr. Balaji Devaraju",
       "advisor_site": "https://iitk.ac.in/new/balaji-devaraju"
-    },
-    {
-      "institution": "Indian Institute of Technology Kanpur",
-      "url": "https://www.iitk.ac.in/",
-      "area": "Civil Engineering",
-      "studyType": "B.Tech.",
-      "startDate": "May 2024",
-      "endDate": "Aug 2019"
     }
   ],
   "publications": [
