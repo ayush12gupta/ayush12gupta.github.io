@@ -7,4 +7,4 @@ related_posts: false
 
 
 
-Accepted paper at <a href="https://ieeexplore.ieee.org/xpl/aboutJournal.jsp?punumber=36">IEEE TGRS</a>: SenGLEAN: An End-to-End Deep Learning Approach for Super-Resolution of Sentinel-2 Multi-Resolution Multispectral Images \[<a href="http://doi.org/10.1109/TGRS.2024.3374575">Paper</a>\]
+Accepted paper at <a href="https://ieeexplore.ieee.org/xpl/aboutJournal.jsp?punumber=36">IEEE TGRS</a>: SenGLEAN: An End-to-End Deep Learning Approach for Super-Resolution of Sentinel-2 Multi-Resolution Multispectral Images \[<a href="http://doi.org/10.1109/TGRS.2024.3374575">Paper</a>\] \[<a href="https://ayush12gupta.github.io/publications/senglean.html">Project Page</a>\]
