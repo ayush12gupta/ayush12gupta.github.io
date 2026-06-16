@@ -1,322 +1,612 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A little question 🐱</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --pink: #D4537E;
-      --pink-light: #FBEAF0;
-      --pink-border: #F4C0D1;
-      --pink-mid: #F0997B;
-      --pink-dark: #993556;
-      --pink-darker: #72243E;
-      --coral: #D85A30;
-      --coral-border: #F0997B;
-      --coral-dark: #712B13;
-      --text: #1a1a1a;
-      --text-muted: #6b6b6b;
-      --text-hint: #aaa;
-      --bg: #fff;
-      --surface: #f9f9f9;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --text: #f0f0f0;
-        --text-muted: #aaa;
-        --text-hint: #666;
-        --bg: #1a1a1a;
-        --surface: #242424;
-        --pink-light: #2a1520;
-        --pink-border: #4a2030;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A little question 🐱</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 0;
-    }
+      :root {
+        --pink: #d4537e;
+        --pink-light: #fbeaf0;
+        --pink-border: #f4c0d1;
+        --pink-mid: #f0997b;
+        --pink-dark: #993556;
+        --pink-darker: #72243e;
+        --coral: #d85a30;
+        --coral-border: #f0997b;
+        --coral-dark: #712b13;
+        --text: #1a1a1a;
+        --text-muted: #6b6b6b;
+        --text-hint: #aaa;
+        --bg: #fff;
+        --surface: #f9f9f9;
+      }
 
-    .app { width: 100%; max-width: 420px; padding: 0 16px; }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text: #f0f0f0;
+          --text-muted: #aaa;
+          --text-hint: #666;
+          --bg: #1a1a1a;
+          --surface: #242424;
+          --pink-light: #2a1520;
+          --pink-border: #4a2030;
+        }
+      }
 
-    .screen { display: none; flex-direction: column; align-items: center; padding: 2.25rem 0 3rem; text-align: center; }
-    .screen.on { display: flex; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 0;
+      }
 
-    .step-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 1.75rem; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink-border); transition: all 0.25s; }
-    .dot.active { background: var(--pink); width: 20px; border-radius: 4px; }
+      .app {
+        width: 100%;
+        max-width: 420px;
+        padding: 0 16px;
+      }
 
-    .cat-orb {
-      width: 130px; height: 130px; border-radius: 50%;
-      background: var(--pink-light); border: 2.5px solid var(--pink-mid);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 58px; margin: 0 auto 1.1rem;
-      overflow: hidden;
-      animation: wobble 3s ease-in-out infinite;
-    }
-    .cat-orb img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-    @keyframes wobble { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+      .screen {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        padding: 2.25rem 0 3rem;
+        text-align: center;
+      }
+      .screen.on {
+        display: flex;
+      }
 
-    .paws { font-size: 20px; letter-spacing: 6px; margin-bottom: 1.25rem; animation: bob 2s ease-in-out infinite; }
-    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+      .step-dots {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        margin-bottom: 1.75rem;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--pink-border);
+        transition: all 0.25s;
+      }
+      .dot.active {
+        background: var(--pink);
+        width: 20px;
+        border-radius: 4px;
+      }
 
-    .card {
-      background: var(--bg);
-      border: 1.5px solid var(--pink-border);
-      border-radius: 20px;
-      padding: 1.5rem 1.25rem;
-      width: 100%;
-    }
+      .cat-orb {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        background: var(--pink-light);
+        border: 2.5px solid var(--pink-mid);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 58px;
+        margin: 0 auto 1.1rem;
+        overflow: hidden;
+        animation: wobble 3s ease-in-out infinite;
+      }
+      .cat-orb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+      @keyframes wobble {
+        0%,
+        100% {
+          transform: rotate(-5deg);
+        }
+        50% {
+          transform: rotate(5deg);
+        }
+      }
 
-    .tag { font-size: 11px; color: var(--pink); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.75rem; }
-    .q { font-size: 21px; font-weight: 600; line-height: 1.4; margin-bottom: 0.5rem; }
-    .sub { font-size: 14px; color: var(--text-muted); line-height: 1.75; margin-bottom: 1.5rem; }
+      .paws {
+        font-size: 20px;
+        letter-spacing: 6px;
+        margin-bottom: 1.25rem;
+        animation: bob 2s ease-in-out infinite;
+      }
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
 
-    .btn-main {
-      display: block; width: 100%; background: var(--pink);
-      border: none; color: #fff; font-size: 16px; font-weight: 600;
-      padding: 15px; border-radius: 50px; cursor: pointer;
-      font-family: inherit; transition: opacity 0.15s, transform 0.15s;
-      margin-bottom: 12px; -webkit-tap-highlight-color: transparent;
-    }
-    .btn-main:active { opacity: 0.85; transform: scale(0.98); }
+      .card {
+        background: var(--bg);
+        border: 1.5px solid var(--pink-border);
+        border-radius: 20px;
+        padding: 1.5rem 1.25rem;
+        width: 100%;
+      }
 
-    .no-wrap { display: flex; justify-content: center; }
-    .no-cont { position: relative; display: inline-block; transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1); }
-    .btn-no {
-      background: transparent; border: 1.5px solid var(--pink-border);
-      color: var(--pink-dark); font-size: 15px; padding: 13px 30px;
-      border-radius: 50px; cursor: pointer; font-family: inherit;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .dodge-note { font-size: 12px; color: var(--text-hint); margin-top: 0.75rem; font-style: italic; min-height: 18px; }
+      .tag {
+        font-size: 11px;
+        color: var(--pink);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+      .q {
+        font-size: 21px;
+        font-weight: 600;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+      }
+      .sub {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.75;
+        margin-bottom: 1.5rem;
+      }
 
-    .ice-orb { font-size: 60px; margin-bottom: 0.75rem; animation: bob 2s ease-in-out infinite; }
+      .btn-main {
+        display: block;
+        width: 100%;
+        background: var(--pink);
+        border: none;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 15px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-family: inherit;
+        transition:
+          opacity 0.15s,
+          transform 0.15s;
+        margin-bottom: 12px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn-main:active {
+        opacity: 0.85;
+        transform: scale(0.98);
+      }
 
-    .pick-lbl { font-size: 11px; color: var(--pink); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; text-align: left; margin-bottom: 0.6rem; }
+      .no-wrap {
+        display: flex;
+        justify-content: center;
+      }
+      .no-cont {
+        position: relative;
+        display: inline-block;
+        transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .btn-no {
+        background: transparent;
+        border: 1.5px solid var(--pink-border);
+        color: var(--pink-dark);
+        font-size: 15px;
+        padding: 13px 30px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-family: inherit;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .dodge-note {
+        font-size: 12px;
+        color: var(--text-hint);
+        margin-top: 0.75rem;
+        font-style: italic;
+        min-height: 18px;
+      }
 
-    .dates-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 1.25rem; }
-    .d-opt {
-      border: 1.5px solid var(--pink-border); border-radius: 14px;
-      padding: 13px 8px; cursor: pointer; font-family: inherit;
-      text-align: center; background: transparent; transition: all 0.18s;
-      -webkit-tap-highlight-color: transparent; min-height: 60px;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .d-opt:active { transform: scale(0.97); }
-    .d-opt.sel { background: var(--pink); border-color: var(--pink); }
-    .d-opt.sel .d-day, .d-opt.sel .d-date { color: #fff; }
-    .d-day { font-size: 13px; font-weight: 600; color: var(--pink-darker); display: block; }
-    .d-date { font-size: 11px; color: var(--pink-dark); display: block; margin-top: 3px; }
-    .d-opt.special { border-color: var(--coral-border); }
-    .d-opt.special .d-day { color: var(--coral-dark); }
-    .d-opt.special.sel { background: var(--coral); border-color: var(--coral); }
-    .d-opt.special.sel .d-date { color: rgba(255,255,255,0.8); }
+      .ice-orb {
+        font-size: 60px;
+        margin-bottom: 0.75rem;
+        animation: bob 2s ease-in-out infinite;
+      }
 
-    .btn-confirm {
-      display: block; width: 100%; background: var(--pink);
-      border: none; color: #fff; font-size: 16px; font-weight: 600;
-      padding: 15px; border-radius: 50px; cursor: pointer;
-      font-family: inherit; opacity: 0.35; pointer-events: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn-confirm.go { opacity: 1; pointer-events: all; }
-    .btn-confirm.go:active { opacity: 0.85; transform: scale(0.98); }
+      .pick-lbl {
+        font-size: 11px;
+        color: var(--pink);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 600;
+        text-align: left;
+        margin-bottom: 0.6rem;
+      }
 
-    .det-block { background: var(--pink-light); border-radius: 14px; padding: 1rem 1.1rem; text-align: left; }
-    .det-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; font-size: 14px; }
-    .det-row:not(:last-child) { border-bottom: 1px solid var(--pink-border); }
-    .det-row i { color: var(--pink); font-size: 17px; flex-shrink: 0; }
-    .det-lbl { color: var(--pink-dark); font-weight: 600; min-width: 58px; }
-    .det-val { color: var(--pink-darker); }
+      .dates-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 1.25rem;
+      }
+      .d-opt {
+        border: 1.5px solid var(--pink-border);
+        border-radius: 14px;
+        padding: 13px 8px;
+        cursor: pointer;
+        font-family: inherit;
+        text-align: center;
+        background: transparent;
+        transition: all 0.18s;
+        -webkit-tap-highlight-color: transparent;
+        min-height: 60px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .d-opt:active {
+        transform: scale(0.97);
+      }
+      .d-opt.sel {
+        background: var(--pink);
+        border-color: var(--pink);
+      }
+      .d-opt.sel .d-day,
+      .d-opt.sel .d-date {
+        color: #fff;
+      }
+      .d-day {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--pink-darker);
+        display: block;
+      }
+      .d-date {
+        font-size: 11px;
+        color: var(--pink-dark);
+        display: block;
+        margin-top: 3px;
+      }
+      .d-opt.special {
+        border-color: var(--coral-border);
+      }
+      .d-opt.special .d-day {
+        color: var(--coral-dark);
+      }
+      .d-opt.special.sel {
+        background: var(--coral);
+        border-color: var(--coral);
+      }
+      .d-opt.special.sel .d-date {
+        color: rgba(255, 255, 255, 0.8);
+      }
 
-    .btn-ghost {
-      background: transparent; border: 1.5px solid var(--pink-border);
-      color: var(--pink-dark); font-size: 14px; padding: 12px 26px;
-      border-radius: 50px; cursor: pointer; font-family: inherit; margin-top: 1rem;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn-ghost:active { opacity: 0.75; }
+      .btn-confirm {
+        display: block;
+        width: 100%;
+        background: var(--pink);
+        border: none;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 15px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-family: inherit;
+        opacity: 0.35;
+        pointer-events: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn-confirm.go {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .btn-confirm.go:active {
+        opacity: 0.85;
+        transform: scale(0.98);
+      }
 
-    .share-card {
-      background: var(--pink-light); border: 2px solid var(--pink-border);
-      border-radius: 20px; padding: 1.5rem 1.25rem; width: 100%;
-      margin-top: 1.25rem; text-align: center;
-    }
-    .share-label { font-size: 11px; color: var(--pink); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.75rem; }
-    .share-big { font-size: 36px; margin-bottom: 0.5rem; }
-    .share-text { font-size: 17px; font-weight: 600; color: var(--pink-darker); line-height: 1.4; margin-bottom: 0.35rem; }
-    .share-sub { font-size: 13px; color: var(--pink-dark); margin-bottom: 1.1rem; }
-    .share-hint { font-size: 12px; color: var(--pink-dark); opacity: 0.7; margin-top: 0.75rem; font-style: italic; }
-    .btn-copy {
-      background: var(--pink); border: none; color: #fff; font-size: 14px;
-      font-weight: 600; padding: 11px 24px; border-radius: 50px; cursor: pointer;
-      font-family: inherit; -webkit-tap-highlight-color: transparent;
-      transition: opacity 0.15s;
-    }
-    .btn-copy:active { opacity: 0.8; }
-    .copied-msg { font-size: 12px; color: var(--pink); margin-top: 0.5rem; min-height: 16px; font-weight: 600; }
-  </style>
-</head>
-<body>
-<div class="app">
+      .det-block {
+        background: var(--pink-light);
+        border-radius: 14px;
+        padding: 1rem 1.1rem;
+        text-align: left;
+      }
+      .det-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 0;
+        font-size: 14px;
+      }
+      .det-row:not(:last-child) {
+        border-bottom: 1px solid var(--pink-border);
+      }
+      .det-row i {
+        color: var(--pink);
+        font-size: 17px;
+        flex-shrink: 0;
+      }
+      .det-lbl {
+        color: var(--pink-dark);
+        font-weight: 600;
+        min-width: 58px;
+      }
+      .det-val {
+        color: var(--pink-darker);
+      }
 
-  <div class="screen on" id="p1">
-    <div class="step-dots">
-      <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
-    </div>
-    <div class="cat-orb">
-      <img src="https://38.media.tumblr.com/f4535c8d22df4ebfa7c47e14777138d2/tumblr_njolig48VO1t04x43o1_400.gif" alt="cute gif" onerror="this.style.display='none';this.parentElement.innerHTML='🐱';" />
-    </div>
-    <div class="paws" aria-hidden="true">🐾 🐾 🐾</div>
-    <div class="card">
-      <div class="tag">a little question</div>
-      <div class="q">Will you go on a date with me? 🐱</div>
-      <div class="sub">Even my cat thinks it's a purrfect idea. I promise it'll be fun — and a little delicious too.</div>
-      <button class="btn-main" onclick="go(2)">🐱 Yes, let's do it!</button>
-      <div class="no-wrap">
-        <div class="no-cont" id="no-cont">
-          <button class="btn-no" ontouchstart="dodge(event)" onmouseover="dodge(event)" onclick="noClick()">Hmm, maybe not…</button>
+      .btn-ghost {
+        background: transparent;
+        border: 1.5px solid var(--pink-border);
+        color: var(--pink-dark);
+        font-size: 14px;
+        padding: 12px 26px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-family: inherit;
+        margin-top: 1rem;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn-ghost:active {
+        opacity: 0.75;
+      }
+
+      .share-card {
+        background: var(--pink-light);
+        border: 2px solid var(--pink-border);
+        border-radius: 20px;
+        padding: 1.5rem 1.25rem;
+        width: 100%;
+        margin-top: 1.25rem;
+        text-align: center;
+      }
+      .share-label {
+        font-size: 11px;
+        color: var(--pink);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+      .share-big {
+        font-size: 36px;
+        margin-bottom: 0.5rem;
+      }
+      .share-text {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--pink-darker);
+        line-height: 1.4;
+        margin-bottom: 0.35rem;
+      }
+      .share-sub {
+        font-size: 13px;
+        color: var(--pink-dark);
+        margin-bottom: 1.1rem;
+      }
+      .share-hint {
+        font-size: 12px;
+        color: var(--pink-dark);
+        opacity: 0.7;
+        margin-top: 0.75rem;
+        font-style: italic;
+      }
+      .btn-copy {
+        background: var(--pink);
+        border: none;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 11px 24px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-family: inherit;
+        -webkit-tap-highlight-color: transparent;
+        transition: opacity 0.15s;
+      }
+      .btn-copy:active {
+        opacity: 0.8;
+      }
+      .copied-msg {
+        font-size: 12px;
+        color: var(--pink);
+        margin-top: 0.5rem;
+        min-height: 16px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="screen on" id="p1">
+        <div class="step-dots">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="cat-orb">
+          <img
+            src="https://38.media.tumblr.com/f4535c8d22df4ebfa7c47e14777138d2/tumblr_njolig48VO1t04x43o1_400.gif"
+            alt="cute gif"
+            onerror="this.style.display='none';this.parentElement.innerHTML='🐱';"
+          />
+        </div>
+        <div class="paws" aria-hidden="true">🐾 🐾 🐾</div>
+        <div class="card">
+          <div class="tag">a little question</div>
+          <div class="q">Will you go on a date with me? 🐱</div>
+          <div class="sub">Even my cat thinks it's a purrfect idea. I promise it'll be fun — and a little delicious too.</div>
+          <button class="btn-main" onclick="go(2)">🐱 Yes, let's do it!</button>
+          <div class="no-wrap">
+            <div class="no-cont" id="no-cont">
+              <button class="btn-no" ontouchstart="dodge(event)" onmouseover="dodge(event)" onclick="noClick()">Hmm, maybe not…</button>
+            </div>
+          </div>
+          <p class="dodge-note" id="dodge-note"></p>
         </div>
       </div>
-      <p class="dodge-note" id="dodge-note"></p>
-    </div>
-  </div>
 
-  <div class="screen" id="p2">
-    <div class="step-dots">
-      <div class="dot"></div><div class="dot active"></div><div class="dot"></div>
-    </div>
-    <div class="ice-orb" aria-hidden="true">🍦</div>
-    <div class="card">
-      <div class="tag">the plan</div>
-      <div class="q">We're going on an ice cream date! 🍦</div>
-      <div class="sub">Two scoops, lots of laughs — maybe some brain freeze. Pick a day that works for you!</div>
-      <div style="width:100%;max-width:280px;border-radius:16px;overflow:hidden;margin:0 auto 1.25rem;border:2px solid var(--pink-border);">
-        <img src="https://media1.tenor.com/m/47VND3nbZKIAAAAd/baby-ice-cream.gif" alt="baby eating ice cream" style="width:100%;display:block;" onerror="this.parentElement.innerHTML='🍦';" />
-      </div>
-      <div class="pick-lbl">When works for you?</div>
-      <div class="dates-grid">
-        <button class="d-opt" onclick="pick(this,'Monday, June 22')"><span class="d-day">Monday</span><span class="d-date">June 22</span></button>
-        <button class="d-opt" onclick="pick(this,'Tuesday, June 23')"><span class="d-day">Tuesday</span><span class="d-date">June 23</span></button>
-        <button class="d-opt" onclick="pick(this,'Wednesday, June 24')"><span class="d-day">Wednesday</span><span class="d-date">June 24</span></button>
-        <button class="d-opt" onclick="pick(this,'Thursday, June 25')"><span class="d-day">Thursday</span><span class="d-date">June 25</span></button>
-        <button class="d-opt" onclick="pick(this,'Friday, June 26')"><span class="d-day">Friday</span><span class="d-date">June 26</span></button>
-        <button class="d-opt special" onclick="pick(this,'Saturday, June 27')"><span class="d-day">Saturday ✨</span><span class="d-date">June 27</span></button>
-      </div>
-      <button class="btn-confirm" id="confirm-btn" onclick="go(3)">🍦 Yes, let's get ice cream!</button>
-    </div>
-  </div>
-
-  <div class="screen" id="p3">
-    <div class="step-dots">
-      <div class="dot"></div><div class="dot"></div><div class="dot active"></div>
-    </div>
-    <div style="width:100%;max-width:280px;border-radius:16px;overflow:hidden;margin:0 auto 1rem;border:2px solid var(--pink-border);">
-      <img src="https://media.tenor.com/vkJQcnn06_EAAAAj/dancing-cat-oppa-gangnam-style.gif" alt="dancing cat" style="width:100%;display:block;" onerror="this.parentElement.innerHTML='🎉🍦';" />
-    </div>
-    <div class="card">
-      <div class="tag">it's official</div>
-      <div class="q">It's a date!</div>
-      <div class="sub" style="margin-bottom:1.25rem;">Can't wait to share some ice cream with you. This is going to be the best scoop ever.</div>
-      <div class="det-block">
-        <div class="det-row">
-          <i class="ti ti-calendar" aria-hidden="true"></i>
-          <span class="det-lbl">When</span>
-          <span class="det-val" id="chosen-day">—</span>
+      <div class="screen" id="p2">
+        <div class="step-dots">
+          <div class="dot"></div>
+          <div class="dot active"></div>
+          <div class="dot"></div>
         </div>
-        <div class="det-row">
-          <i class="ti ti-ice-cream" aria-hidden="true"></i>
-          <span class="det-lbl">What</span>
-          <span class="det-val">Ice cream date 🍦</span>
-        </div>
-        <div class="det-row">
-          <i class="ti ti-heart" aria-hidden="true"></i>
-          <span class="det-lbl">Vibe</span>
-          <span class="det-val">Silly, sweet & perfect</span>
+        <div class="ice-orb" aria-hidden="true">🍦</div>
+        <div class="card">
+          <div class="tag">the plan</div>
+          <div class="q">We're going on an ice cream date! 🍦</div>
+          <div class="sub">Two scoops, lots of laughs — maybe some brain freeze. Pick a day that works for you!</div>
+          <div
+            style="width: 100%; max-width: 280px; border-radius: 16px; overflow: hidden; margin: 0 auto 1.25rem; border: 2px solid var(--pink-border)"
+          >
+            <img
+              src="https://media1.tenor.com/m/47VND3nbZKIAAAAd/baby-ice-cream.gif"
+              alt="baby eating ice cream"
+              style="width: 100%; display: block"
+              onerror="this.parentElement.innerHTML='🍦';"
+            />
+          </div>
+          <div class="pick-lbl">When works for you?</div>
+          <div class="dates-grid">
+            <button class="d-opt" onclick="pick(this,'Monday, June 22')"><span class="d-day">Monday</span><span class="d-date">June 22</span></button>
+            <button class="d-opt" onclick="pick(this,'Tuesday, June 23')">
+              <span class="d-day">Tuesday</span><span class="d-date">June 23</span>
+            </button>
+            <button class="d-opt" onclick="pick(this,'Wednesday, June 24')">
+              <span class="d-day">Wednesday</span><span class="d-date">June 24</span>
+            </button>
+            <button class="d-opt" onclick="pick(this,'Thursday, June 25')">
+              <span class="d-day">Thursday</span><span class="d-date">June 25</span>
+            </button>
+            <button class="d-opt" onclick="pick(this,'Friday, June 26')"><span class="d-day">Friday</span><span class="d-date">June 26</span></button>
+            <button class="d-opt special" onclick="pick(this,'Saturday, June 27')">
+              <span class="d-day">Saturday ✨</span><span class="d-date">June 27</span>
+            </button>
+          </div>
+          <button class="btn-confirm" id="confirm-btn" onclick="go(3)">🍦 Yes, let's get ice cream!</button>
         </div>
       </div>
+
+      <div class="screen" id="p3">
+        <div class="step-dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot active"></div>
+        </div>
+        <div style="width: 100%; max-width: 280px; border-radius: 16px; overflow: hidden; margin: 0 auto 1rem; border: 2px solid var(--pink-border)">
+          <img
+            src="https://media.tenor.com/vkJQcnn06_EAAAAj/dancing-cat-oppa-gangnam-style.gif"
+            alt="dancing cat"
+            style="width: 100%; display: block"
+            onerror="this.parentElement.innerHTML='🎉🍦';"
+          />
+        </div>
+        <div class="card">
+          <div class="tag">it's official</div>
+          <div class="q">It's a date!</div>
+          <div class="sub" style="margin-bottom: 1.25rem">Can't wait to share some ice cream with you. This is going to be the best scoop ever.</div>
+          <div class="det-block">
+            <div class="det-row">
+              <i class="ti ti-calendar" aria-hidden="true"></i>
+              <span class="det-lbl">When</span>
+              <span class="det-val" id="chosen-day">—</span>
+            </div>
+            <div class="det-row">
+              <i class="ti ti-ice-cream" aria-hidden="true"></i>
+              <span class="det-lbl">What</span>
+              <span class="det-val">Ice cream date 🍦</span>
+            </div>
+            <div class="det-row">
+              <i class="ti ti-heart" aria-hidden="true"></i>
+              <span class="det-lbl">Vibe</span>
+              <span class="det-val">Silly, sweet & perfect</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="share-card">
+          <div class="share-label">screenshot & send this 📸</div>
+          <div class="share-big">🍦🐱🍦</div>
+          <div class="share-text">I said yes to ice cream!</div>
+          <div class="share-sub" id="share-sub">See you on —</div>
+          <button class="btn-copy" onclick="copyText()">Copy message</button>
+          <div class="copied-msg" id="copied-msg"></div>
+          <div class="share-hint">screenshot this card and send it back 🐾</div>
+        </div>
+
+        <button class="btn-ghost" onclick="go(2)">← Change the day</button>
+      </div>
     </div>
 
-    <div class="share-card">
-      <div class="share-label">screenshot & send this 📸</div>
-      <div class="share-big">🍦🐱🍦</div>
-      <div class="share-text">I said yes to ice cream!</div>
-      <div class="share-sub" id="share-sub">See you on —</div>
-      <button class="btn-copy" onclick="copyText()">Copy message</button>
-      <div class="copied-msg" id="copied-msg"></div>
-      <div class="share-hint">screenshot this card and send it back 🐾</div>
-    </div>
+    <script>
+      let chosenDate = null,
+        dodgeCount = 0;
+      const notes = [
+        "It's shy on mobile too 🐱",
+        "Still running!",
+        "Okay but the cat says yes.",
+        "You're making the cat sad.",
+        "Fine, I'll ask again later.",
+      ];
 
-    <button class="btn-ghost" onclick="go(2)">← Change the day</button>
-  </div>
+      function go(n) {
+        document.querySelectorAll(".screen").forEach((s) => s.classList.remove("on"));
+        document.getElementById("p" + n).classList.add("on");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (n === 3) {
+          document.getElementById("chosen-day").textContent = chosenDate;
+          document.getElementById("share-sub").textContent = "See you on " + chosenDate + " 🍦";
+          document.getElementById("copied-msg").textContent = "";
+        }
+      }
 
-</div>
+      function copyText() {
+        const msg = "🍦🐱 I said yes to the ice cream date! See you on " + chosenDate + " 🍦";
+        navigator.clipboard
+          .writeText(msg)
+          .then(() => {
+            document.getElementById("copied-msg").textContent = "Copied! Now paste it and send 🐱";
+          })
+          .catch(() => {
+            document.getElementById("copied-msg").textContent = "Screenshot this card instead 📸";
+          });
+      }
 
-<script>
-  let chosenDate = null, dodgeCount = 0;
-  const notes = [
-    "It's shy on mobile too 🐱",
-    "Still running!",
-    "Okay but the cat says yes.",
-    "You're making the cat sad.",
-    "Fine, I'll ask again later."
-  ];
+      function dodge(e) {
+        if (e) e.preventDefault();
+        const cont = document.getElementById("no-cont");
+        const parent = cont.parentElement;
+        const pW = parent.offsetWidth;
+        const cW = cont.offsetWidth;
+        const curLeft = cont.getBoundingClientRect().left - parent.getBoundingClientRect().left;
+        const newX = Math.max(0, Math.min(pW - cW, Math.random() * (pW - cW)));
+        const newY = (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 20);
+        cont.style.transform = `translate(${newX - curLeft}px, ${newY}px)`;
+        document.getElementById("dodge-note").textContent = notes[Math.min(dodgeCount++, notes.length - 1)];
+      }
 
-  function go(n) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
-    document.getElementById('p' + n).classList.add('on');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (n === 3) {
-      document.getElementById('chosen-day').textContent = chosenDate;
-      document.getElementById('share-sub').textContent = 'See you on ' + chosenDate + ' 🍦';
-      document.getElementById('copied-msg').textContent = '';
-    }
-  }
+      function noClick() {
+        document.getElementById("dodge-note").textContent = "Fine, but the cat still says yes 🐱";
+      }
 
-  function copyText() {
-    const msg = '🍦🐱 I said yes to the ice cream date! See you on ' + chosenDate + ' 🍦';
-    navigator.clipboard.writeText(msg).then(() => {
-      document.getElementById('copied-msg').textContent = 'Copied! Now paste it and send 🐱';
-    }).catch(() => {
-      document.getElementById('copied-msg').textContent = 'Screenshot this card instead 📸';
-    });
-  }
-
-  function dodge(e) {
-    if (e) e.preventDefault();
-    const cont = document.getElementById('no-cont');
-    const parent = cont.parentElement;
-    const pW = parent.offsetWidth;
-    const cW = cont.offsetWidth;
-    const curLeft = cont.getBoundingClientRect().left - parent.getBoundingClientRect().left;
-    const newX = Math.max(0, Math.min(pW - cW, Math.random() * (pW - cW)));
-    const newY = (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 20);
-    cont.style.transform = `translate(${newX - curLeft}px, ${newY}px)`;
-    document.getElementById('dodge-note').textContent = notes[Math.min(dodgeCount++, notes.length - 1)];
-  }
-
-  function noClick() {
-    document.getElementById('dodge-note').textContent = "Fine, but the cat still says yes 🐱";
-  }
-
-  function pick(btn, dateStr) {
-    document.querySelectorAll('.d-opt').forEach(b => b.classList.remove('sel'));
-    btn.classList.add('sel');
-    chosenDate = dateStr;
-    document.getElementById('confirm-btn').classList.add('go');
-  }
-</script>
-</body>
+      function pick(btn, dateStr) {
+        document.querySelectorAll(".d-opt").forEach((b) => b.classList.remove("sel"));
+        btn.classList.add("sel");
+        chosenDate = dateStr;
+        document.getElementById("confirm-btn").classList.add("go");
+      }
+    </script>
+  </body>
 </html>
