@@ -41,9 +41,10 @@
           <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem">{{ content.institution }}</h6>
           <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem; font-style: italic">{{ content.area }}</h6>
           {% if content.advisor %}
-              <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem">
-                <b>Advisor(s):</b>
-                &nbsp; 
+            <h6 class="ml-1 ml-md-4" style="font-size: 0.95rem">
+              <b>Advisor(s):</b>
+              &nbsp;
+              <span>
                 {% if content.advisor %}
                   <a href="{{ content.advisor_site }}">
                     <i> {{ content.advisor }} </i>
@@ -52,6 +53,7 @@
                   <i> {{ content.advisor }} </i>
                 {% endif %}
               </span>
+            </h6>
           {% endif %}
           <ul class="items">
             {% for item in content.courses %}
