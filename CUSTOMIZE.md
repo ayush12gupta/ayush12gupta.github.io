@@ -47,7 +47,7 @@ There are currently 2 different ways of generating the CV page content. The firs
 
 The second way is by using a YAML file, which is not a standard but is very convenient, located in [\_data/cv.yml](_data/cv.yml).
 
-What this means is, if there is no resume data defined in [\_config.yml](_config.yml) and loaded via a json file, it will load the contents of [\_data/cv.yml](_data/cv.yml). If you want to use the YAML file, make sure to remove the reference to the JSON file from the _config.yml file.
+What this means is, if there is no resume data defined in [\_config.yml](_config.yml) and loaded via a json file, it will load the contents of [\_data/cv.yml](_data/cv.yml). If you want to use the YAML file, make sure to remove the reference to the JSON file from the \_config.yml file.
 
 ## Modifying the user and repository information
 
@@ -141,7 +141,7 @@ You can implement your own buttons by editing the [\_layouts/bib.liquid](_layout
 
 ## Changing theme color
 
-A variety of beautiful theme colors have been selected for you to choose from. The default is purple, but you can quickly change it by editing the `--global-theme-color` variable in the [\_sass/_themes.scss](_sass/_themes.scss) file.
+A variety of beautiful theme colors have been selected for you to choose from. The default is purple, but you can quickly change it by editing the `--global-theme-color` variable in the [\_sass/\_themes.scss](_sass/_themes.scss) file.
 
 ## Adding social media information
 
