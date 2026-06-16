@@ -79,7 +79,10 @@
       width: 100%;
     }
 
-    .tag { font-size: 11px; color: var(--pink); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.75rem; }
+    .tag {
+      font-size: 11px; color: var(--pink); letter-spacing: 0.1em;
+      text-transform: uppercase; font-weight: 600; margin-bottom: 0.75rem;
+    }
     .q { font-size: 21px; font-weight: 600; line-height: 1.4; margin-bottom: 0.5rem; }
     .sub { font-size: 14px; color: var(--text-muted); line-height: 1.75; margin-bottom: 1.5rem; }
 
@@ -103,6 +106,21 @@
     .dodge-note { font-size: 12px; color: var(--text-hint); margin-top: 0.75rem; font-style: italic; min-height: 18px; }
 
     .ice-orb { font-size: 60px; margin-bottom: 0.75rem; animation: bob 2s ease-in-out infinite; }
+
+    .photo-slot {
+      border: 2px dashed var(--pink-border); border-radius: 16px;
+      background: var(--pink-light); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+      cursor: pointer; position: relative; overflow: hidden;
+      min-height: 155px; margin-bottom: 1.25rem;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .photo-slot img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; display: none; position: absolute; top: 0; left: 0; }
+    .photo-slot img.on { display: block; }
+    .photo-slot input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .ph-icon { font-size: 32px; }
+    .ph-label { font-size: 13px; color: var(--pink-dark); font-weight: 600; }
+    .ph-hint { font-size: 12px; color: var(--pink); opacity: 0.7; }
 
     .pick-lbl { font-size: 11px; color: var(--pink); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600; text-align: left; margin-bottom: 0.6rem; }
 
@@ -133,6 +151,8 @@
     }
     .btn-confirm.go { opacity: 1; pointer-events: all; }
     .btn-confirm.go:active { opacity: 0.85; transform: scale(0.98); }
+
+    .confetti-emoji { font-size: 54px; margin-bottom: 0.75rem; animation: bob 2s ease-in-out infinite; }
 
     .det-block { background: var(--pink-light); border-radius: 14px; padding: 1rem 1.1rem; text-align: left; }
     .det-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; font-size: 14px; }
@@ -172,14 +192,19 @@
 <body>
 <div class="app">
 
+  <!-- Page 1: The Ask -->
   <div class="screen on" id="p1">
     <div class="step-dots">
-      <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
     </div>
+
     <div class="cat-orb">
       <img src="https://38.media.tumblr.com/f4535c8d22df4ebfa7c47e14777138d2/tumblr_njolig48VO1t04x43o1_400.gif" alt="cute gif" onerror="this.style.display='none';this.parentElement.innerHTML='🐱';" />
     </div>
     <div class="paws" aria-hidden="true">🐾 🐾 🐾</div>
+
     <div class="card">
       <div class="tag">a little question</div>
       <div class="q">Will you (and Chloe) go on a date with me? 🐱</div>
@@ -194,18 +219,25 @@
     </div>
   </div>
 
+  <!-- Page 2: Ice Cream Reveal -->
   <div class="screen" id="p2">
     <div class="step-dots">
-      <div class="dot"></div><div class="dot active"></div><div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div>
     </div>
+
     <div class="ice-orb" aria-hidden="true">🍦</div>
+
     <div class="card">
       <div class="tag">the plan</div>
       <div class="q">We're going on an ice cream date! 🍦</div>
       <div class="sub">Think of it as our own little Love Island date — except no eliminations, just ice cream and good company. Pick a day!</div>
+
       <div style="width:100%;max-width:280px;border-radius:16px;overflow:hidden;margin:0 auto 1.25rem;border:2px solid var(--pink-border);">
         <img src="https://media1.tenor.com/m/47VND3nbZKIAAAAd/baby-ice-cream.gif" alt="baby eating ice cream" style="width:100%;display:block;" onerror="this.parentElement.innerHTML='🍦';" />
       </div>
+
       <div class="pick-lbl">When works for you?</div>
       <div class="dates-grid">
         <button class="d-opt" onclick="pick(this,'Monday, June 22')"><span class="d-day">Monday</span><span class="d-date">June 22</span></button>
@@ -215,17 +247,23 @@
         <button class="d-opt" onclick="pick(this,'Friday, June 26')"><span class="d-day">Friday</span><span class="d-date">June 26</span></button>
         <button class="d-opt special" onclick="pick(this,'Saturday, June 27')"><span class="d-day">Saturday ✨</span><span class="d-date">June 27</span></button>
       </div>
+
       <button class="btn-confirm" id="confirm-btn" onclick="go(3)">🍦 Yes, let's get ice cream!</button>
     </div>
   </div>
 
+  <!-- Page 3: Confirmed -->
   <div class="screen" id="p3">
     <div class="step-dots">
-      <div class="dot"></div><div class="dot"></div><div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot active"></div>
     </div>
+
     <div style="width:100%;max-width:280px;border-radius:16px;overflow:hidden;margin:0 auto 1rem;border:2px solid var(--pink-border);">
-      <img src="https://media.tenor.com/vkJQcnn06_EAAAAj/dancing-cat-oppa-gangnam-style.gif" alt="dancing cat" style="width:100%;display:block;" onerror="this.parentElement.innerHTML='🎉🍦';" />
+      <img src="cat_dance.gif" alt="dancing cat" style="width:100%;display:block;" onerror="this.parentElement.innerHTML='🎉🍦';" />
     </div>
+
     <div class="card">
       <div class="tag">it's official</div>
       <div class="q">It's a date!</div>
@@ -248,15 +286,17 @@
         </div>
       </div>
     </div>
-    <div class="share-card">
+
+    <div class="share-card" id="share-card">
       <div class="share-label">screenshot & send this 📸</div>
       <div class="share-big">🍦🐱🍦</div>
-      <div class="share-text">I said yes to ice cream!</div>
+      <div class="share-text" id="share-text">I said yes to ice cream!</div>
       <div class="share-sub" id="share-sub">See you on —</div>
       <button class="btn-copy" onclick="copyText()">Copy message</button>
       <div class="copied-msg" id="copied-msg"></div>
       <div class="share-hint">screenshot this card and send it back 🐾</div>
     </div>
+
     <button class="btn-ghost" onclick="go(2)">← Change the day</button>
   </div>
 
@@ -265,10 +305,10 @@
 <script>
   let chosenDate = null, dodgeCount = 0;
   const notes = [
-    "Chloe wouldn't hide like this 🐱",
+    "It's shy on mobile too 🐱",
     "Still running!",
-    "Okay but Chloe says yes.",
-    "You're making Chloe sad.",
+    "Okay but the cat says yes.",
+    "You're making the cat sad.",
     "Fine, I'll ask again later."
   ];
 
@@ -306,7 +346,7 @@
   }
 
   function noClick() {
-    document.getElementById('dodge-note').textContent = "Fine, but Chloe still says yes 🐱";
+    document.getElementById('dodge-note').textContent = "Fine, but the cat still says yes 🐱";
   }
 
   function pick(btn, dateStr) {
@@ -314,6 +354,19 @@
     btn.classList.add('sel');
     chosenDate = dateStr;
     document.getElementById('confirm-btn').classList.add('go');
+  }
+
+  function loadPhoto(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('uploaded-img');
+      img.src = e.target.result;
+      img.classList.add('on');
+      document.getElementById('ph-placeholder').style.display = 'none';
+      document.getElementById('photo-slot').style.minHeight = '200px';
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 </script>
 </body>
