@@ -246,6 +246,7 @@
         <button class="d-opt" onclick="pick(this,'Thursday, June 25')"><span class="d-day">Thursday</span><span class="d-date">June 25</span></button>
         <button class="d-opt" onclick="pick(this,'Friday, June 26')"><span class="d-day">Friday</span><span class="d-date">June 26</span></button>
         <button class="d-opt special" onclick="pick(this,'Saturday, June 27')"><span class="d-day">Saturday ✨</span><span class="d-date">June 27</span></button>
+        <button class="d-opt special" onclick="pick(this,'Sunday, June 28')"><span class="d-day">Sunday ✨</span><span class="d-date">June 28</span></button>
       </div>
 
       <button class="btn-confirm" id="confirm-btn" onclick="go(3)">🍦 Yes, let's get ice cream!</button>
@@ -306,10 +307,10 @@
   let chosenDate = null, dodgeCount = 0;
   const notes = [
     "It's shy on mobile too 🐱",
-    "Still running! 🏃🏃",
-    "Okay but Chloe says yes 😺",
-    "You're making Chloe sad 😿",
-    "Fine, I'll ask again later 🥹"
+    "Still running!",
+    "Okay but the cat says yes.",
+    "You're making the cat sad.",
+    "Fine, I'll ask again later."
   ];
 
   function go(n) {
