@@ -142,43 +142,70 @@
   </div>
 </div>
 
-<script>
-  var STORAGE_KEY = 'together-activities';
-  function load() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; } }
-  function save(items) { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
-  function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function render() {
-    var items = load();
-    var ul = document.getElementById('activity-list');
-    var empty = document.getElementById('empty-msg');
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+  import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCihVHgSKRVcR-_RAbnm-pa4J4WXZOAvdc",
+    authDomain: "katelyn-e4521.firebaseapp.com",
+    databaseURL: "https://katelyn-e4521-default-rtdb.firebaseio.com",
+    projectId: "katelyn-e4521",
+    storageBucket: "katelyn-e4521.firebasestorage.app",
+    messagingSenderId: "624664107803",
+    appId: "1:624664107803:web:603aae0dd561fed69811be"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const activitiesRef = ref(db, 'activities');
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  onValue(activitiesRef, function(snapshot) {
+    const ul = document.getElementById('activity-list');
+    const empty = document.getElementById('empty-msg');
     ul.innerHTML = '';
-    empty.style.display = items.length ? 'none' : 'block';
-    items.forEach(function(item, i) {
-      var li = document.createElement('li');
-      if (item.done) li.classList.add('done');
-      li.innerHTML = '<input type="checkbox"' + (item.done ? ' checked' : '') + ' onchange="toggle(' + i + ')" />' +
-        '<span>' + escHtml(item.text) + '</span>' +
-        '<button class="del-btn" onclick="remove(' + i + ')" title="delete">✕</button>';
-      ul.appendChild(li);
-    });
-  }
-  function addActivity() {
-    var input = document.getElementById('activity-input');
-    var text = input.value.trim();
+    const data = snapshot.val();
+    if (!data) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    Object.entries(data)
+      .sort(function(a, b) { return (a[1].createdAt || 0) - (b[1].createdAt || 0); })
+      .forEach(function([key, item]) {
+        const li = document.createElement('li');
+        if (item.done) li.classList.add('done');
+        li.innerHTML =
+          '<input type="checkbox"' + (item.done ? ' checked' : '') + ' />' +
+          '<span>' + escHtml(item.text) + '</span>' +
+          '<button class="del-btn" title="delete">✕</button>';
+        li.querySelector('input').addEventListener('change', function() {
+          update(ref(db, 'activities/' + key), { done: !item.done });
+        });
+        li.querySelector('.del-btn').addEventListener('click', function() {
+          remove(ref(db, 'activities/' + key));
+        });
+        ul.appendChild(li);
+      });
+  });
+
+  window.addActivity = function() {
+    const input = document.getElementById('activity-input');
+    const text = input.value.trim();
     if (!text) return;
-    var items = load(); items.push({ text: text, done: false }); save(items);
-    input.value = ''; render();
-  }
-  function toggle(i) { var items = load(); items[i].done = !items[i].done; save(items); render(); }
-  function remove(i) { var items = load(); items.splice(i, 1); save(items); render(); }
-  function fetchCat() {
-    var img = document.getElementById('random-cat');
+    push(activitiesRef, { text: text, done: false, createdAt: Date.now() });
+    input.value = '';
+  };
+
+  window.fetchCat = function() {
+    const img = document.getElementById('random-cat');
     img.style.display = 'block';
     img.src = 'https://cataas.com/cat/gif?t=' + Date.now();
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('activity-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') addActivity(); });
-    render();
+  };
+
+  document.getElementById('activity-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') window.addActivity();
   });
 </script>
 
