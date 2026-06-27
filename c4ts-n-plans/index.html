@@ -178,7 +178,7 @@
         if (item.done) li.classList.add('done');
         li.innerHTML =
           '<input type="checkbox"' + (item.done ? ' checked' : '') + ' />' +
-          '<span>' + escHtml(item.text) + '</span>' +
+          '<span style="color:' + (item.done ? '#999' : '#333') + '">' + escHtml(item.text) + '</span>' +
           '<button class="del-btn" title="delete">✕</button>';
         li.querySelector('input').addEventListener('change', function() {
           update(ref(db, 'activities/' + key), { done: !item.done });
