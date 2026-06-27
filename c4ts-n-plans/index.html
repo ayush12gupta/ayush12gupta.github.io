@@ -129,15 +129,9 @@
   </div>
   <div class="cats-card">
     <div class="card-title">🐱 cat corner</div>
-    <div class="gif-grid">
-      <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="cat" loading="lazy" />
-      <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif" alt="cat" loading="lazy" />
-      <img src="https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif" alt="cat" loading="lazy" />
-      <img src="https://media.giphy.com/media/8vQSQ3cNXuDGo/giphy.gif" alt="cat" loading="lazy" />
-    </div>
+    <div class="gif-grid" id="gif-grid"></div>
     <div class="random-cat-wrap">
-      <img id="random-cat" alt="random cat" />
-      <button class="cat-btn" onclick="fetchCat()">show me another cat 🐾</button>
+      <button class="cat-btn" onclick="shuffleGifs()">shuffle cats 🐾</button>
     </div>
   </div>
 </div>
@@ -198,11 +192,24 @@
     input.value = '';
   };
 
-  window.fetchCat = function() {
-    const img = document.getElementById('random-cat');
-    img.style.display = 'block';
-    img.src = 'https://cataas.com/cat/gif?t=' + Date.now();
+  const GIFS = [
+    '/c4ts-n-plans/gif/cat_dance.gif',
+    '/c4ts-n-plans/gif/cat_paw.gif',
+    'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif',
+    'https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif',
+    'https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif',
+    'https://media.giphy.com/media/8vQSQ3cNXuDGo/giphy.gif',
+  ];
+
+  window.shuffleGifs = function() {
+    const shuffled = GIFS.slice().sort(function() { return Math.random() - 0.5; });
+    const grid = document.getElementById('gif-grid');
+    grid.innerHTML = shuffled.slice(0, 4).map(function(src) {
+      return '<img src="' + src + '" alt="cat" loading="lazy" />';
+    }).join('');
   };
+
+  window.shuffleGifs();
 
   document.getElementById('activity-input').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') window.addActivity();
