@@ -199,14 +199,14 @@
     'https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif',
     'https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif',
     'https://media.giphy.com/media/8vQSQ3cNXuDGo/giphy.gif',
-    'https://media.giphy.com/media/ICOgUNjpvO0PC/giphy.gif',
-    'https://media.giphy.com/media/nR4L10XlJcSeQ/giphy.gif',
+    'https://media.giphy.com/media/GeimqsH0TLDt4tScGw/giphy.gif',
+    'https://media.giphy.com/media/BzyTuYCmvSORqs1ABM/giphy.gif',
   ];
 
   window.shuffleGifs = function() {
     const shuffled = GIFS.slice().sort(function() { return Math.random() - 0.5; });
     const grid = document.getElementById('gif-grid');
-    grid.innerHTML = shuffled.slice(0, 4).map(function(src) {
+    grid.innerHTML = shuffled.slice(0, 6).map(function(src) {
       return '<img src="' + src + '" alt="cat" loading="lazy" />';
     }).join('');
   };
