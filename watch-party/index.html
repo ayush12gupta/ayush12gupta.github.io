@@ -224,6 +224,7 @@
   .msg-body .name { font-weight: 700; color: var(--text); font-size: 0.92rem; }
   .msg-body .line { font-size: 0.92rem; line-height: 1.35; color: var(--text); word-break: break-word; }
   .msg-body .line.system-line { color: var(--muted); }
+  .msg-body .line.emoji-line { font-size: 2.2rem; line-height: 1.2; }
 
   .modal-overlay {
     display: none;
@@ -445,6 +446,8 @@ function colorFor(name) {
 let lastMsgName = null;
 let lastGroupBody = null;
 
+const EMOJI_ONLY_RE = /^(\p{Extended_Pictographic}|\p{Emoji_Modifier}|‍|️|\s)+$/u;
+
 function renderChat(msg) {
   const line = document.createElement('div');
   line.className = 'line' + (msg.type === 'system' ? ' system-line' : '');
@@ -455,6 +458,7 @@ function renderChat(msg) {
     line.appendChild(img);
   } else {
     line.textContent = msg.text;
+    if (EMOJI_ONLY_RE.test(msg.text)) line.classList.add('emoji-line');
   }
 
   if (msg.name && msg.name === lastMsgName && lastGroupBody) {
