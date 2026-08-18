@@ -408,8 +408,9 @@ function handleIncoming(msg, fromConn) {
     if (fromConn) { fromConn._name = msg.name; fromConn._avatar = msg.avatar; }
     addSystem(msg.name, msg.avatar, 'joined the party 🎉');
   } else if (msg.type === 'sync') {
-    if (msg.name && msg.action !== 'seek') {
-      addSystem(msg.name, msg.avatar, msg.action === 'play' ? 'started playing the video' : 'paused the video');
+    if (msg.name) {
+      if (msg.action === 'seek') addSystem(msg.name, msg.avatar, 'jumped to ' + formatTime(msg.time));
+      else addSystem(msg.name, msg.avatar, msg.action === 'play' ? 'started playing the video' : 'paused the video');
     }
     applyingRemote = true;
     if (Math.abs(video.currentTime - msg.time) > 0.6) video.currentTime = msg.time;
@@ -454,12 +455,30 @@ function sendChat() {
   chatInput.value = '';
 }
 
-['play', 'pause', 'seeked'].forEach(ev => {
+function formatTime(s) {
+  s = Math.floor(s);
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const mm = String(m).padStart(2, '0'), ss = String(sec).padStart(2, '0');
+  return h > 0 ? h + ':' + mm + ':' + ss : m + ':' + ss;
+}
+
+// ponytail: scrubbing the native seek bar fires spurious pause/play events around the
+// real seek — a fixed cooldown after 'seeked' swallows those. Not foolproof across all
+// browsers, but covers the common Chrome/Safari scrub behavior.
+let seekCooldown = false;
+video.addEventListener('seeking', () => { seekCooldown = true; });
+video.addEventListener('seeked', () => {
+  if (!applyingRemote) {
+    addSystem(myName, myAvatar, 'jumped to ' + formatTime(video.currentTime));
+    relay({ type: 'sync', action: 'seek', time: video.currentTime, name: myName, avatar: myAvatar });
+  }
+  setTimeout(() => { seekCooldown = false; }, 400);
+});
+['play', 'pause'].forEach(ev => {
   video.addEventListener(ev, () => {
-    if (applyingRemote) return;
-    const action = ev === 'seeked' ? 'seek' : ev;
-    if (action !== 'seek') addSystem(myName, myAvatar, action === 'play' ? 'started playing the video' : 'paused the video');
-    relay({ type: 'sync', action, time: video.currentTime, name: myName, avatar: myAvatar });
+    if (applyingRemote || seekCooldown) return;
+    addSystem(myName, myAvatar, ev === 'play' ? 'started playing the video' : 'paused the video');
+    relay({ type: 'sync', action: ev, time: video.currentTime, name: myName, avatar: myAvatar });
   });
 });
 video.addEventListener('error', () => setStatus('could not load that video — check the URL allows direct/hotlink playback'));
