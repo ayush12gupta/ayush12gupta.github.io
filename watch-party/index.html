@@ -462,11 +462,17 @@ function formatTime(s) {
   return h > 0 ? h + ':' + mm + ':' + ss : m + ':' + ss;
 }
 
-// ponytail: scrubbing the native seek bar fires spurious pause/play events around the
-// real seek — a fixed cooldown after 'seeked' swallows those. Not foolproof across all
-// browsers, but covers the common Chrome/Safari scrub behavior.
+// ponytail: dragging the native seek bar makes the browser pause *before* 'seeking'
+// fires, then resume after 'seeked' — both are scrub artifacts, not real user actions.
+// The trailing resume is caught by a cooldown; the leading pause is caught by delaying
+// its report briefly so a following 'seeking' can cancel it. Not foolproof across every
+// browser, but covers common Chrome/Safari scrub behavior.
 let seekCooldown = false;
-video.addEventListener('seeking', () => { seekCooldown = true; });
+let pendingPause = null;
+video.addEventListener('seeking', () => {
+  seekCooldown = true;
+  if (pendingPause) { clearTimeout(pendingPause); pendingPause = null; }
+});
 video.addEventListener('seeked', () => {
   if (!applyingRemote) {
     addSystem(myName, myAvatar, 'jumped to ' + formatTime(video.currentTime));
@@ -474,12 +480,18 @@ video.addEventListener('seeked', () => {
   }
   setTimeout(() => { seekCooldown = false; }, 400);
 });
-['play', 'pause'].forEach(ev => {
-  video.addEventListener(ev, () => {
-    if (applyingRemote || seekCooldown) return;
-    addSystem(myName, myAvatar, ev === 'play' ? 'started playing the video' : 'paused the video');
-    relay({ type: 'sync', action: ev, time: video.currentTime, name: myName, avatar: myAvatar });
-  });
+video.addEventListener('pause', () => {
+  if (applyingRemote || seekCooldown) return;
+  pendingPause = setTimeout(() => {
+    pendingPause = null;
+    addSystem(myName, myAvatar, 'paused the video');
+    relay({ type: 'sync', action: 'pause', time: video.currentTime, name: myName, avatar: myAvatar });
+  }, 150);
+});
+video.addEventListener('play', () => {
+  if (applyingRemote || seekCooldown) return;
+  addSystem(myName, myAvatar, 'started playing the video');
+  relay({ type: 'sync', action: 'play', time: video.currentTime, name: myName, avatar: myAvatar });
 });
 video.addEventListener('error', () => setStatus('could not load that video — check the URL allows direct/hotlink playback'));
 
