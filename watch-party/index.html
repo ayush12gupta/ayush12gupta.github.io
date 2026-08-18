@@ -245,6 +245,7 @@
   }
   .modal-card h2 { margin: 0 0 1rem; color: var(--accent-strong); font-size: 1.1rem; }
   .modal-card input[type=text] { margin-bottom: 1rem; }
+  .picker-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; }
   .avatar-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -295,6 +296,8 @@
     <h2>your name &amp; avatar</h2>
     <input type="text" id="nameInput" placeholder="your name" maxlength="20">
     <div class="avatar-grid" id="avatarGrid"></div>
+    <div class="picker-label">emoji button color</div>
+    <div class="avatar-grid" id="heartGrid"></div>
     <button id="saveProfileBtn">save</button>
   </div>
 </div>
@@ -328,7 +331,7 @@
     </div>
     <div class="chat-input-bar">
       <input type="text" id="chatInput" placeholder="Type a message…">
-      <button id="emojiBtn" type="button" title="emoji">😊</button>
+      <button id="emojiBtn" type="button" title="emoji"></button>
       <button id="gifBtn" type="button" title="GIF">GIF</button>
     </div>
   </div>
@@ -360,6 +363,7 @@ const avatarBtn = document.getElementById('avatarBtn');
 const profileModal = document.getElementById('profileModal');
 const nameInput = document.getElementById('nameInput');
 const avatarGrid = document.getElementById('avatarGrid');
+const heartGrid = document.getElementById('heartGrid');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 
 function applyTheme(t) {
@@ -382,17 +386,21 @@ document.addEventListener('fullscreenchange', () => {
 });
 
 const AVATARS = ['🐱', '🐶', '🦊', '🐼', '🐨', '🦁', '🐵', '🐰', '🦄', '🐯', '🐹', '🐷', '🐸', '🐙', '🦖'];
+const HEARTS = ['💜', '❤️', '🧡', '💛', '💚', '💙', '🩷', '🩵', '🖤', '🤍', '🤎'];
 
 let myName = localStorage.getItem('wp_name') || ('Guest' + Math.floor(Math.random() * 1000));
 let myAvatar = localStorage.getItem('wp_avatar') || AVATARS[Math.floor(Math.random() * AVATARS.length)];
+let myHeart = localStorage.getItem('wp_heart') || '💜';
 localStorage.setItem('wp_name', myName);
 localStorage.setItem('wp_avatar', myAvatar);
+localStorage.setItem('wp_heart', myHeart);
 
 function refreshAvatarBtn() {
   avatarBtn.textContent = myAvatar;
   avatarBtn.style.background = colorFor(myName);
 }
 refreshAvatarBtn();
+emojiBtn.textContent = myHeart;
 AVATARS.forEach(a => {
   const b = document.createElement('button');
   b.type = 'button';
@@ -404,9 +412,21 @@ AVATARS.forEach(a => {
   };
   avatarGrid.appendChild(b);
 });
+HEARTS.forEach(h => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'avatar-opt';
+  b.textContent = h;
+  b.onclick = () => {
+    heartGrid.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected'));
+    b.classList.add('selected');
+  };
+  heartGrid.appendChild(b);
+});
 function openProfileModal() {
   nameInput.value = myName;
   avatarGrid.querySelectorAll('.avatar-opt').forEach(el => el.classList.toggle('selected', el.textContent === myAvatar));
+  heartGrid.querySelectorAll('.avatar-opt').forEach(el => el.classList.toggle('selected', el.textContent === myHeart));
   profileModal.style.display = 'flex';
 }
 avatarBtn.onclick = openProfileModal;
@@ -416,8 +436,12 @@ saveProfileBtn.onclick = () => {
   if (n) myName = n;
   const picked = avatarGrid.querySelector('.avatar-opt.selected');
   if (picked) myAvatar = picked.textContent;
+  const pickedHeart = heartGrid.querySelector('.avatar-opt.selected');
+  if (pickedHeart) myHeart = pickedHeart.textContent;
   localStorage.setItem('wp_name', myName);
   localStorage.setItem('wp_avatar', myAvatar);
+  localStorage.setItem('wp_heart', myHeart);
+  emojiBtn.textContent = myHeart;
   refreshAvatarBtn();
   profileModal.style.display = 'none';
 };
