@@ -529,27 +529,27 @@ document.addEventListener('click', e => {
   }
 });
 
-// get a free key at https://tenor.com/developer/dashboard and paste it here
-const TENOR_API_KEY = 'YOUR_TENOR_API_KEY';
+// get a free beta key at https://developers.giphy.com/dashboard and paste it here
+const GIPHY_API_KEY = 'YOUR_GIPHY_API_KEY';
 
 let gifSearchTimer = null;
 
 function loadGifs(query) {
   gifResults.innerHTML = '<div class="gif-results-msg">loading…</div>';
   const url = query
-    ? 'https://tenor.googleapis.com/v2/search?q=' + encodeURIComponent(query) + '&key=' + TENOR_API_KEY + '&client_key=watch_party&limit=20&media_filter=tinygif'
-    : 'https://tenor.googleapis.com/v2/featured?key=' + TENOR_API_KEY + '&client_key=watch_party&limit=20&media_filter=tinygif';
+    ? 'https://api.giphy.com/v1/gifs/search?api_key=' + GIPHY_API_KEY + '&q=' + encodeURIComponent(query) + '&limit=20&rating=pg-13'
+    : 'https://api.giphy.com/v1/gifs/trending?api_key=' + GIPHY_API_KEY + '&limit=20&rating=pg-13';
   fetch(url).then(r => r.json()).then(data => {
     gifResults.innerHTML = '';
-    const results = data.results || [];
+    const results = data.data || [];
     if (!results.length) { gifResults.innerHTML = '<div class="gif-results-msg">no GIFs found</div>'; return; }
     results.forEach(g => {
       const img = document.createElement('img');
-      img.src = g.media_formats.tinygif.url;
-      img.onclick = () => sendGif(g.media_formats.tinygif.url);
+      img.src = g.images.fixed_width_small.url;
+      img.onclick = () => sendGif(g.images.fixed_width.url);
       gifResults.appendChild(img);
     });
-  }).catch(() => { gifResults.innerHTML = '<div class="gif-results-msg">could not load GIFs — check the Tenor API key</div>'; });
+  }).catch(() => { gifResults.innerHTML = '<div class="gif-results-msg">could not load GIFs — check the GIPHY API key</div>'; });
 }
 
 function sendGif(url) {
