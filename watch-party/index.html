@@ -151,6 +151,35 @@
     --button-active-background: var(--accent-strong);
     --indicator-color: var(--accent-strong);
   }
+  #gifBtn { padding: 0.5rem 0.7rem; font-size: 0.85rem; font-weight: 700; }
+  .gif-picker {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: absolute;
+    bottom: 3.6rem;
+    right: 1rem;
+    z-index: 20;
+    width: 320px;
+    max-width: 90vw;
+    height: 360px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.8rem;
+    box-shadow: 0 4px 18px var(--shadow);
+    padding: 0.6rem;
+  }
+  .gif-results {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+    align-content: start;
+  }
+  .gif-results img { width: 100%; border-radius: 0.4rem; cursor: pointer; display: block; }
+  .gif-results-msg { color: var(--muted); font-size: 0.85rem; grid-column: 1 / -1; }
+  .gif-msg { max-width: 220px; border-radius: 0.6rem; display: block; margin-top: 0.2rem; }
   #chatLog { flex: 1; overflow-y: auto; margin-bottom: 0.6rem; padding-right: 0.2rem; }
   .msg { display: flex; gap: 0.6rem; align-items: flex-start; margin-bottom: 0.9rem; }
   .avatar-bubble {
@@ -264,9 +293,14 @@
   <div class="chat-col">
     <div id="chatLog"></div>
     <emoji-picker></emoji-picker>
+    <div class="gif-picker" id="gifPicker">
+      <input type="text" id="gifSearch" placeholder="search GIFs…">
+      <div class="gif-results" id="gifResults"></div>
+    </div>
     <div class="row" style="margin-bottom:0;">
       <input type="text" id="chatInput" placeholder="say something…">
       <button id="emojiBtn" type="button" title="emoji">😊</button>
+      <button id="gifBtn" type="button" title="GIF">GIF</button>
       <button id="sendBtn">send</button>
     </div>
   </div>
@@ -288,6 +322,10 @@ const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
 const emojiBtn = document.getElementById('emojiBtn');
 const emojiPicker = document.querySelector('emoji-picker');
+const gifBtn = document.getElementById('gifBtn');
+const gifPicker = document.getElementById('gifPicker');
+const gifSearch = document.getElementById('gifSearch');
+const gifResults = document.getElementById('gifResults');
 const themeBtn = document.getElementById('themeBtn');
 const theater = document.getElementById('theater');
 const theaterBtn = document.getElementById('theaterBtn');
@@ -384,7 +422,14 @@ let lastGroupBody = null;
 function renderChat(msg) {
   const line = document.createElement('div');
   line.className = 'line' + (msg.type === 'system' ? ' system-line' : '');
-  line.textContent = msg.text;
+  if (msg.gif) {
+    const img = document.createElement('img');
+    img.className = 'gif-msg';
+    img.src = msg.gif;
+    line.appendChild(img);
+  } else {
+    line.textContent = msg.text;
+  }
 
   if (msg.name && msg.name === lastMsgName && lastGroupBody) {
     lastGroupBody.appendChild(line);
@@ -481,6 +526,52 @@ emojiPicker.addEventListener('emoji-click', e => {
 document.addEventListener('click', e => {
   if (emojiPicker.style.display === 'block' && !emojiPicker.contains(e.target) && e.target !== emojiBtn) {
     emojiPicker.style.display = 'none';
+  }
+});
+
+// get a free key at https://tenor.com/developer/dashboard and paste it here
+const TENOR_API_KEY = 'YOUR_TENOR_API_KEY';
+
+let gifSearchTimer = null;
+
+function loadGifs(query) {
+  gifResults.innerHTML = '<div class="gif-results-msg">loading…</div>';
+  const url = query
+    ? 'https://tenor.googleapis.com/v2/search?q=' + encodeURIComponent(query) + '&key=' + TENOR_API_KEY + '&client_key=watch_party&limit=20&media_filter=tinygif'
+    : 'https://tenor.googleapis.com/v2/featured?key=' + TENOR_API_KEY + '&client_key=watch_party&limit=20&media_filter=tinygif';
+  fetch(url).then(r => r.json()).then(data => {
+    gifResults.innerHTML = '';
+    const results = data.results || [];
+    if (!results.length) { gifResults.innerHTML = '<div class="gif-results-msg">no GIFs found</div>'; return; }
+    results.forEach(g => {
+      const img = document.createElement('img');
+      img.src = g.media_formats.tinygif.url;
+      img.onclick = () => sendGif(g.media_formats.tinygif.url);
+      gifResults.appendChild(img);
+    });
+  }).catch(() => { gifResults.innerHTML = '<div class="gif-results-msg">could not load GIFs — check the Tenor API key</div>'; });
+}
+
+function sendGif(url) {
+  const msg = { type: 'chat', name: myName, avatar: myAvatar, gif: url };
+  chatHistory.push(msg);
+  renderChat(msg);
+  relay(msg);
+  gifPicker.style.display = 'none';
+}
+
+gifBtn.onclick = () => {
+  const opening = gifPicker.style.display !== 'flex';
+  gifPicker.style.display = opening ? 'flex' : 'none';
+  if (opening && !gifResults.children.length) loadGifs('');
+};
+gifSearch.addEventListener('input', () => {
+  clearTimeout(gifSearchTimer);
+  gifSearchTimer = setTimeout(() => loadGifs(gifSearch.value.trim()), 400);
+});
+document.addEventListener('click', e => {
+  if (gifPicker.style.display === 'flex' && !gifPicker.contains(e.target) && e.target !== gifBtn) {
+    gifPicker.style.display = 'none';
   }
 });
 chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
