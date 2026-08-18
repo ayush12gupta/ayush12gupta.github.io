@@ -368,7 +368,7 @@
     <div id="chatLog"></div>
     <div class="emoji-picker-wrap" id="emojiPickerWrap">
       <emoji-picker></emoji-picker>
-      <button id="heartToggleBtn" type="button" title="heart color"></button>
+      <button id="heartToggleBtn" type="button" title="send a heart">💜</button>
       <div class="heart-dropdown" id="heartDropdown"></div>
     </div>
     <div class="gif-picker" id="gifPicker">
@@ -377,7 +377,7 @@
     </div>
     <div class="chat-input-bar">
       <input type="text" id="chatInput" placeholder="Type a message…">
-      <button id="emojiBtn" type="button" title="emoji"></button>
+      <button id="emojiBtn" type="button" title="emoji">💜</button>
       <button id="gifBtn" type="button" title="GIF">GIF</button>
     </div>
   </div>
@@ -438,10 +438,8 @@ const HEARTS = ['💜', '❤️', '🧡', '💚', '💙', '🩷', '🤍', '🤎'
 
 let myName = localStorage.getItem('wp_name') || ('Guest' + Math.floor(Math.random() * 1000));
 let myAvatar = localStorage.getItem('wp_avatar') || AVATARS[Math.floor(Math.random() * AVATARS.length)];
-let myHeart = localStorage.getItem('wp_heart') || '💜';
 localStorage.setItem('wp_name', myName);
 localStorage.setItem('wp_avatar', myAvatar);
-localStorage.setItem('wp_heart', myHeart);
 
 function refreshAvatarBtn() {
   avatarBtn.textContent = myAvatar;
@@ -624,21 +622,19 @@ customElements.whenDefined('emoji-picker').then(() => {
   emojiPicker.shadowRoot.appendChild(style);
 });
 
-function setHeart(h) {
-  myHeart = h;
-  localStorage.setItem('wp_heart', myHeart);
-  emojiBtn.textContent = myHeart;
-  heartToggleBtn.textContent = myHeart;
+function sendHeart(h) {
+  const msg = { type: 'chat', name: myName, avatar: myAvatar, text: h };
+  chatHistory.push(msg);
+  renderChat(msg);
+  relay(msg);
+  heartDropdown.classList.remove('open');
+  emojiPickerWrap.style.display = 'none';
 }
-setHeart(myHeart);
 HEARTS.forEach(h => {
   const b = document.createElement('button');
   b.type = 'button';
   b.textContent = h;
-  b.onclick = () => {
-    setHeart(h);
-    heartDropdown.classList.remove('open');
-  };
+  b.onclick = () => sendHeart(h);
   heartDropdown.appendChild(b);
 });
 heartToggleBtn.onclick = e => {
