@@ -158,7 +158,7 @@
   .chat-input-bar button:hover { background: var(--border); opacity: 1; }
   #emojiBtn { font-size: 1.1rem; }
   #gifBtn { font-size: 0.7rem; font-weight: 700; border-radius: 0.4rem; width: auto; padding: 0 0.5rem; background: var(--border); }
-  emoji-picker {
+  .emoji-picker-wrap {
     display: none;
     position: absolute;
     bottom: 3.6rem;
@@ -167,6 +167,10 @@
     width: 320px;
     max-width: 90vw;
     height: 360px;
+  }
+  emoji-picker {
+    width: 100%;
+    height: 100%;
     box-shadow: 0 4px 18px var(--shadow);
     border-radius: 0.8rem;
     --background: var(--card-bg);
@@ -180,6 +184,44 @@
     --button-active-background: var(--accent-strong);
     --indicator-color: var(--accent-strong);
   }
+  #heartToggleBtn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    z-index: 2;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    padding: 0.2rem;
+    line-height: 1;
+    width: auto;
+    height: auto;
+  }
+  .heart-dropdown {
+    display: none;
+    flex-direction: column;
+    gap: 0.15rem;
+    position: absolute;
+    top: 42px;
+    right: 8px;
+    z-index: 3;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 18px var(--shadow);
+    padding: 0.3rem;
+  }
+  .heart-dropdown.open { display: flex; }
+  .heart-dropdown button {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 0.4rem;
+    width: auto;
+    height: auto;
+  }
+  .heart-dropdown button:hover { background: var(--input-bg); }
   .gif-picker {
     display: none;
     flex-direction: column;
@@ -245,7 +287,6 @@
   }
   .modal-card h2 { margin: 0 0 1rem; color: var(--accent-strong); font-size: 1.1rem; }
   .modal-card input[type=text] { margin-bottom: 1rem; }
-  .picker-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; }
   .avatar-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -296,8 +337,6 @@
     <h2>your name &amp; avatar</h2>
     <input type="text" id="nameInput" placeholder="your name" maxlength="20">
     <div class="avatar-grid" id="avatarGrid"></div>
-    <div class="picker-label">emoji button color</div>
-    <div class="avatar-grid" id="heartGrid"></div>
     <button id="saveProfileBtn">save</button>
   </div>
 </div>
@@ -324,7 +363,11 @@
   <video id="video" controls></video>
   <div class="chat-col">
     <div id="chatLog"></div>
-    <emoji-picker></emoji-picker>
+    <div class="emoji-picker-wrap" id="emojiPickerWrap">
+      <emoji-picker></emoji-picker>
+      <button id="heartToggleBtn" type="button" title="heart color"></button>
+      <div class="heart-dropdown" id="heartDropdown"></div>
+    </div>
     <div class="gif-picker" id="gifPicker">
       <input type="text" id="gifSearch" placeholder="search GIFs…">
       <div class="gif-results" id="gifResults"></div>
@@ -352,6 +395,9 @@ const chatLog = document.getElementById('chatLog');
 const chatInput = document.getElementById('chatInput');
 const emojiBtn = document.getElementById('emojiBtn');
 const emojiPicker = document.querySelector('emoji-picker');
+const emojiPickerWrap = document.getElementById('emojiPickerWrap');
+const heartToggleBtn = document.getElementById('heartToggleBtn');
+const heartDropdown = document.getElementById('heartDropdown');
 const gifBtn = document.getElementById('gifBtn');
 const gifPicker = document.getElementById('gifPicker');
 const gifSearch = document.getElementById('gifSearch');
@@ -363,7 +409,6 @@ const avatarBtn = document.getElementById('avatarBtn');
 const profileModal = document.getElementById('profileModal');
 const nameInput = document.getElementById('nameInput');
 const avatarGrid = document.getElementById('avatarGrid');
-const heartGrid = document.getElementById('heartGrid');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
 
 function applyTheme(t) {
@@ -400,7 +445,6 @@ function refreshAvatarBtn() {
   avatarBtn.style.background = colorFor(myName);
 }
 refreshAvatarBtn();
-emojiBtn.textContent = myHeart;
 AVATARS.forEach(a => {
   const b = document.createElement('button');
   b.type = 'button';
@@ -412,21 +456,9 @@ AVATARS.forEach(a => {
   };
   avatarGrid.appendChild(b);
 });
-HEARTS.forEach(h => {
-  const b = document.createElement('button');
-  b.type = 'button';
-  b.className = 'avatar-opt';
-  b.textContent = h;
-  b.onclick = () => {
-    heartGrid.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected'));
-    b.classList.add('selected');
-  };
-  heartGrid.appendChild(b);
-});
 function openProfileModal() {
   nameInput.value = myName;
   avatarGrid.querySelectorAll('.avatar-opt').forEach(el => el.classList.toggle('selected', el.textContent === myAvatar));
-  heartGrid.querySelectorAll('.avatar-opt').forEach(el => el.classList.toggle('selected', el.textContent === myHeart));
   profileModal.style.display = 'flex';
 }
 avatarBtn.onclick = openProfileModal;
@@ -436,12 +468,8 @@ saveProfileBtn.onclick = () => {
   if (n) myName = n;
   const picked = avatarGrid.querySelector('.avatar-opt.selected');
   if (picked) myAvatar = picked.textContent;
-  const pickedHeart = heartGrid.querySelector('.avatar-opt.selected');
-  if (pickedHeart) myHeart = pickedHeart.textContent;
   localStorage.setItem('wp_name', myName);
   localStorage.setItem('wp_avatar', myAvatar);
-  localStorage.setItem('wp_heart', myHeart);
-  emojiBtn.textContent = myHeart;
   refreshAvatarBtn();
   profileModal.style.display = 'none';
 };
@@ -570,15 +598,53 @@ loadBtn.onclick = () => {
 
 
 emojiBtn.onclick = () => {
-  emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
+  emojiPickerWrap.style.display = emojiPickerWrap.style.display === 'block' ? 'none' : 'block';
 };
 emojiPicker.addEventListener('emoji-click', e => {
   chatInput.value += e.detail.unicode;
   chatInput.focus();
 });
 document.addEventListener('click', e => {
-  if (emojiPicker.style.display === 'block' && !emojiPicker.contains(e.target) && e.target !== emojiBtn) {
-    emojiPicker.style.display = 'none';
+  if (emojiPickerWrap.style.display === 'block' && !emojiPickerWrap.contains(e.target) && e.target !== emojiBtn) {
+    emojiPickerWrap.style.display = 'none';
+    heartDropdown.classList.remove('open');
+  }
+});
+
+// the picker's built-in skin-tone button (hand emoji, top-right) only supports real
+// Unicode skin-tone modifiers, which hearts don't have — so we hide it via the
+// library's documented shadow-root style injection and use our own heart-color
+// button in its place instead of fighting the built-in control's real purpose.
+customElements.whenDefined('emoji-picker').then(() => {
+  const style = document.createElement('style');
+  style.textContent = '.skintone-button-wrapper, #skintone-list { display: none !important; }';
+  emojiPicker.shadowRoot.appendChild(style);
+});
+
+function setHeart(h) {
+  myHeart = h;
+  localStorage.setItem('wp_heart', myHeart);
+  emojiBtn.textContent = myHeart;
+  heartToggleBtn.textContent = myHeart;
+}
+setHeart(myHeart);
+HEARTS.forEach(h => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = h;
+  b.onclick = () => {
+    setHeart(h);
+    heartDropdown.classList.remove('open');
+  };
+  heartDropdown.appendChild(b);
+});
+heartToggleBtn.onclick = e => {
+  e.stopPropagation();
+  heartDropdown.classList.toggle('open');
+};
+document.addEventListener('click', e => {
+  if (heartDropdown.classList.contains('open') && !heartDropdown.contains(e.target) && e.target !== heartToggleBtn) {
+    heartDropdown.classList.remove('open');
   }
 });
 
