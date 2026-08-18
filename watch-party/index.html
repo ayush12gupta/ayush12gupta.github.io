@@ -128,6 +128,23 @@
     flex-direction: column;
     height: 70vh;
   }
+  .quick-emoji-row {
+    display: flex;
+    gap: 0.2rem;
+    margin-bottom: 0.5rem;
+    overflow-x: auto;
+  }
+  .quick-emoji-row button {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    padding: 0.2rem 0.35rem;
+    border-radius: 0.4rem;
+    width: auto;
+    height: auto;
+    flex-shrink: 0;
+  }
+  .quick-emoji-row button:hover { background: var(--input-bg); }
   .chat-input-bar {
     display: flex;
     align-items: center;
@@ -375,6 +392,7 @@
       <input type="text" id="gifSearch" placeholder="search GIFs…">
       <div class="gif-results" id="gifResults"></div>
     </div>
+    <div class="quick-emoji-row" id="quickEmojiRow"></div>
     <div class="chat-input-bar">
       <input type="text" id="chatInput" placeholder="Type a message…">
       <button id="emojiBtn" type="button" title="emoji">💜</button>
@@ -622,14 +640,27 @@ customElements.whenDefined('emoji-picker').then(() => {
   emojiPicker.shadowRoot.appendChild(style);
 });
 
-function sendHeart(h) {
-  const msg = { type: 'chat', name: myName, avatar: myAvatar, text: h };
+function quickSend(text) {
+  const msg = { type: 'chat', name: myName, avatar: myAvatar, text };
   chatHistory.push(msg);
   renderChat(msg);
   relay(msg);
+}
+function sendHeart(h) {
+  quickSend(h);
   heartDropdown.classList.remove('open');
   emojiPickerWrap.style.display = 'none';
 }
+
+const QUICK_EMOJIS = ['😂', '😘', '💜', '🤯', '😭', '😱', '🤪', '☠️'];
+const quickEmojiRow = document.getElementById('quickEmojiRow');
+QUICK_EMOJIS.forEach(e => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = e;
+  b.onclick = () => quickSend(e);
+  quickEmojiRow.appendChild(b);
+});
 HEARTS.forEach(h => {
   const b = document.createElement('button');
   b.type = 'button';
