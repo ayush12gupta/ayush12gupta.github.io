@@ -691,7 +691,8 @@ REACT_EMOJIS.forEach(e => {
 function openReactMenu(id, btn) {
   reactMenuTargetId = id;
   const r = btn.getBoundingClientRect();
-  reactMenu.style.left = r.left + 'px';
+  reactMenu.style.left = 'auto';
+  reactMenu.style.right = (window.innerWidth - r.right) + 'px';
   reactMenu.style.top = (r.top - 44) + 'px';
   reactMenu.style.display = 'flex';
 }
