@@ -288,6 +288,92 @@
   .msg-body .line { font-size: 0.92rem; line-height: 1.35; color: var(--text); word-break: break-word; }
   .msg-body .line.system-line { color: var(--muted); }
   .msg-body .line.emoji-line { font-size: 2.2rem; line-height: 1.2; }
+  .msg-line-wrap { position: relative; }
+  .reply-quote {
+    font-size: 0.8rem;
+    color: var(--muted);
+    border-left: 2px solid var(--border);
+    padding-left: 0.4rem;
+    margin-bottom: 0.15rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .msg-actions {
+    display: none;
+    position: absolute;
+    top: -0.6rem;
+    right: 0;
+    gap: 0.1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    padding: 0.1rem;
+  }
+  .msg-line-wrap:hover .msg-actions { display: flex; }
+  .msg-action-btn {
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.4rem;
+    width: auto;
+    height: auto;
+  }
+  .msg-action-btn:hover { background: var(--input-bg); }
+  .reactions-row { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.2rem; }
+  .reaction-pill {
+    font-size: 0.78rem;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.05rem 0.4rem;
+  }
+  .reply-preview {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: var(--input-bg);
+    border-left: 3px solid var(--accent-strong);
+    border-radius: 0.4rem;
+    padding: 0.3rem 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .reply-preview span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #cancelReplyBtn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 0;
+    width: auto;
+    height: auto;
+    flex-shrink: 0;
+  }
+  .react-menu {
+    display: none;
+    gap: 0.15rem;
+    position: fixed;
+    z-index: 30;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 18px var(--shadow);
+    padding: 0.3rem;
+  }
+  .react-menu button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    padding: 0.15rem 0.3rem;
+    border-radius: 0.4rem;
+    width: auto;
+    height: auto;
+  }
+  .react-menu button:hover { background: var(--input-bg); }
 
   .modal-overlay {
     display: none;
@@ -394,6 +480,10 @@
       <div class="gif-results" id="gifResults"></div>
     </div>
     <div class="quick-emoji-row" id="quickEmojiRow"></div>
+    <div class="reply-preview" id="replyPreview">
+      <span id="replyPreviewText"></span>
+      <button type="button" id="cancelReplyBtn">✕</button>
+    </div>
     <div class="chat-input-bar">
       <input type="text" id="chatInput" placeholder="Type a message…">
       <button id="emojiBtn" type="button" title="emoji">💜</button>
@@ -401,6 +491,7 @@
     </div>
   </div>
 </div>
+<div class="react-menu" id="reactMenu"></div>
 
 <script>
 // ponytail: sync is event-driven (play/pause/seek), no periodic drift correction.
@@ -432,6 +523,10 @@ const profileModal = document.getElementById('profileModal');
 const nameInput = document.getElementById('nameInput');
 const avatarGrid = document.getElementById('avatarGrid');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
+const replyPreview = document.getElementById('replyPreview');
+const replyPreviewText = document.getElementById('replyPreviewText');
+const cancelReplyBtn = document.getElementById('cancelReplyBtn');
+const reactMenu = document.getElementById('reactMenu');
 
 function applyTheme(t) {
   document.documentElement.dataset.theme = t;
@@ -507,6 +602,103 @@ const conns = []; // host only
 let applyingRemote = false;
 let chatHistory = [];
 
+let replyingTo = null; // { id, name, snippet }
+const msgEls = {}; // message id -> { wrap, reactionsRow } DOM refs, for in-place reaction updates
+const reactions = {}; // message id -> { emoji: Set(names) }
+
+function newMsgId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+function setReplyingTo(target) {
+  replyingTo = target;
+  replyPreviewText.textContent = 'replying to ' + target.name + ': ' + target.snippet;
+  replyPreview.style.display = 'flex';
+  chatInput.focus();
+}
+function clearReply() {
+  replyingTo = null;
+  replyPreview.style.display = 'none';
+}
+cancelReplyBtn.onclick = clearReply;
+
+function withReply(msg) {
+  if (replyingTo) {
+    msg.replyTo = replyingTo;
+    clearReply();
+  }
+  return msg;
+}
+
+const REACT_EMOJIS = ['❤️', '😂', '😮', '😢', '🙏', '👍'];
+let reactMenuTargetId = null;
+REACT_EMOJIS.forEach(e => {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = e;
+  b.onclick = () => {
+    if (reactMenuTargetId) toggleReaction(reactMenuTargetId, e);
+    reactMenu.style.display = 'none';
+  };
+  reactMenu.appendChild(b);
+});
+function openReactMenu(id, btn) {
+  reactMenuTargetId = id;
+  const r = btn.getBoundingClientRect();
+  reactMenu.style.left = r.left + 'px';
+  reactMenu.style.top = (r.top - 44) + 'px';
+  reactMenu.style.display = 'flex';
+}
+document.addEventListener('click', e => {
+  if (reactMenu.style.display === 'flex' && !reactMenu.contains(e.target)) reactMenu.style.display = 'none';
+});
+
+function toggleReaction(id, emoji) {
+  applyReaction(id, emoji, myName);
+  relay({ type: 'reaction', targetId: id, emoji, name: myName });
+}
+
+function applyReaction(id, emoji, name) {
+  if (!reactions[id]) reactions[id] = {};
+  let hadThis = false;
+  for (const em in reactions[id]) {
+    const set = reactions[id][em];
+    if (set.has(name)) {
+      if (em === emoji) hadThis = true;
+      set.delete(name);
+      if (!set.size) delete reactions[id][em];
+    }
+  }
+  if (!hadThis) {
+    if (!reactions[id][emoji]) reactions[id][emoji] = new Set();
+    reactions[id][emoji].add(name);
+  }
+  renderReactions(id);
+}
+
+function renderReactions(id) {
+  const entry = msgEls[id];
+  if (!entry) return;
+  entry.reactionsRow.innerHTML = '';
+  const byEmoji = reactions[id] || {};
+  Object.keys(byEmoji).forEach(emoji => {
+    const set = byEmoji[emoji];
+    if (!set.size) return;
+    const pill = document.createElement('span');
+    pill.className = 'reaction-pill';
+    pill.textContent = emoji + ' ' + set.size;
+    pill.title = Array.from(set).join(', ');
+    entry.reactionsRow.appendChild(pill);
+  });
+}
+
+function serializeReactions() {
+  const out = {};
+  for (const id in reactions) {
+    out[id] = {};
+    for (const emoji in reactions[id]) out[id][emoji] = Array.from(reactions[id][emoji]);
+  }
+  return out;
+}
+
 function setStatus(s) { statusEl.textContent = s; }
 
 function colorFor(name) {
@@ -521,6 +713,16 @@ let lastGroupBody = null;
 const EMOJI_ONLY_RE = /^(\p{Extended_Pictographic}|\p{Emoji_Modifier}|‍|️|\s)+$/u;
 
 function renderChat(msg) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-line-wrap';
+
+  if (msg.replyTo) {
+    const quote = document.createElement('div');
+    quote.className = 'reply-quote';
+    quote.textContent = msg.replyTo.name + ': ' + msg.replyTo.snippet;
+    wrap.appendChild(quote);
+  }
+
   const line = document.createElement('div');
   line.className = 'line' + (msg.type === 'system' ? ' system-line' : '');
   if (msg.gif) {
@@ -532,9 +734,35 @@ function renderChat(msg) {
     line.textContent = msg.text;
     if (EMOJI_ONLY_RE.test(msg.text)) line.classList.add('emoji-line');
   }
+  wrap.appendChild(line);
+
+  if (msg.id) {
+    const actions = document.createElement('div');
+    actions.className = 'msg-actions';
+    const replyBtn = document.createElement('button');
+    replyBtn.type = 'button';
+    replyBtn.className = 'msg-action-btn';
+    replyBtn.textContent = '↩';
+    replyBtn.title = 'reply';
+    replyBtn.onclick = () => setReplyingTo({ id: msg.id, name: msg.name, snippet: msg.gif ? '📷 GIF' : msg.text });
+    actions.appendChild(replyBtn);
+    const reactBtn = document.createElement('button');
+    reactBtn.type = 'button';
+    reactBtn.className = 'msg-action-btn';
+    reactBtn.textContent = '☺+';
+    reactBtn.title = 'react';
+    reactBtn.onclick = e => { e.stopPropagation(); openReactMenu(msg.id, reactBtn); };
+    actions.appendChild(reactBtn);
+    wrap.appendChild(actions);
+
+    const reactionsRow = document.createElement('div');
+    reactionsRow.className = 'reactions-row';
+    wrap.appendChild(reactionsRow);
+    msgEls[msg.id] = { wrap, reactionsRow };
+  }
 
   if (msg.name && msg.name === lastMsgName && lastGroupBody) {
-    lastGroupBody.appendChild(line);
+    lastGroupBody.appendChild(wrap);
   } else {
     const row = document.createElement('div');
     row.className = 'msg';
@@ -549,13 +777,15 @@ function renderChat(msg) {
     nameEl.className = 'name';
     nameEl.textContent = msg.name || '';
     body.appendChild(nameEl);
-    body.appendChild(line);
+    body.appendChild(wrap);
     row.appendChild(body);
     chatLog.appendChild(row);
     lastGroupBody = body;
   }
   lastMsgName = msg.name;
   chatLog.scrollTop = chatLog.scrollHeight;
+
+  if (msg.id && reactions[msg.id]) renderReactions(msg.id);
 }
 
 function relay(msg) {
@@ -593,13 +823,23 @@ function handleIncoming(msg, fromConn) {
   } else if (msg.type === 'load') {
     if (video.src !== msg.url) { video.src = msg.url; video.load(); }
     if (msg.name) addSystem(msg.name, msg.avatar, 'loaded a new video');
+  } else if (msg.type === 'reaction') {
+    applyReaction(msg.targetId, msg.emoji, msg.name);
   } else if (msg.type === 'state') {
     if (msg.url) { video.src = msg.url; video.currentTime = msg.time; if (!msg.paused) video.play(); }
     chatHistory = msg.chat || [];
     chatLog.innerHTML = '';
     lastMsgName = null;
     lastGroupBody = null;
+    for (const k in msgEls) delete msgEls[k];
+    for (const k in reactions) delete reactions[k];
     chatHistory.forEach(renderChat);
+    const incoming = msg.reactions || {};
+    Object.keys(incoming).forEach(id => {
+      reactions[id] = {};
+      Object.keys(incoming[id]).forEach(emoji => { reactions[id][emoji] = new Set(incoming[id][emoji]); });
+      renderReactions(id);
+    });
   }
   if (isHost && fromConn) conns.forEach(c => { if (c !== fromConn) c.send(msg); });
 }
@@ -642,7 +882,7 @@ customElements.whenDefined('emoji-picker').then(() => {
 });
 
 function quickSend(text) {
-  const msg = { type: 'chat', name: myName, avatar: myAvatar, text };
+  const msg = withReply({ type: 'chat', id: newMsgId(), name: myName, avatar: myAvatar, text });
   chatHistory.push(msg);
   renderChat(msg);
   relay(msg);
@@ -703,7 +943,7 @@ function loadGifs(query) {
 }
 
 function sendGif(url) {
-  const msg = { type: 'chat', name: myName, avatar: myAvatar, gif: url };
+  const msg = withReply({ type: 'chat', id: newMsgId(), name: myName, avatar: myAvatar, gif: url });
   chatHistory.push(msg);
   renderChat(msg);
   relay(msg);
@@ -729,7 +969,7 @@ chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); 
 function sendChat() {
   const text = chatInput.value.trim();
   if (!text) return;
-  const msg = { type: 'chat', name: myName, avatar: myAvatar, text };
+  const msg = withReply({ type: 'chat', id: newMsgId(), name: myName, avatar: myAvatar, text });
   chatHistory.push(msg);
   renderChat(msg);
   relay(msg);
@@ -827,7 +1067,7 @@ getIceServers().then(iceServers => {
   peer.on('connection', conn => {
     conns.push(conn);
     conn.on('open', () => {
-      conn.send({ type: 'state', url: video.src || null, time: video.currentTime, paused: video.paused, chat: chatHistory });
+      conn.send({ type: 'state', url: video.src || null, time: video.currentTime, paused: video.paused, chat: chatHistory, reactions: serializeReactions() });
       setStatus(conns.length + ' other viewer(s) connected');
     });
     conn.on('data', msg => handleIncoming(msg, conn));
