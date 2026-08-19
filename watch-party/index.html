@@ -50,7 +50,7 @@
     color: var(--text);
     border: 2px solid var(--border);
   }
-  #avatarBtn {
+  #membersBtn, #avatarBtn {
     background: var(--input-bg);
     border: 2px solid var(--border);
     border-radius: 50%;
@@ -409,6 +409,8 @@
     cursor: pointer;
   }
   .avatar-opt.selected { border-color: var(--accent-strong); background: var(--accent-strong); }
+  .member-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0; }
+  .member-row span { color: var(--text); font-size: 0.95rem; }
 
   /* theater mode: video + chat side by side, everything else dropped */
   .theater:fullscreen, .theater:-webkit-full-screen {
@@ -435,6 +437,7 @@
 <body>
 <header>
   <div class="header-right">
+    <button id="membersBtn" title="who's here">👥</button>
     <button id="avatarBtn" title="change name/avatar"></button>
     <button id="themeBtn">light mode</button>
   </div>
@@ -445,6 +448,12 @@
     <input type="text" id="nameInput" placeholder="your name" maxlength="20">
     <div class="avatar-grid" id="avatarGrid"></div>
     <button id="saveProfileBtn">save</button>
+  </div>
+</div>
+<div class="modal-overlay" id="membersModal">
+  <div class="modal-card">
+    <h2>who's here</h2>
+    <div id="membersList"></div>
   </div>
 </div>
 <div class="wrap">
@@ -527,6 +536,9 @@ const replyPreview = document.getElementById('replyPreview');
 const replyPreviewText = document.getElementById('replyPreviewText');
 const cancelReplyBtn = document.getElementById('cancelReplyBtn');
 const reactMenu = document.getElementById('reactMenu');
+const membersBtn = document.getElementById('membersBtn');
+const membersModal = document.getElementById('membersModal');
+const membersList = document.getElementById('membersList');
 
 function applyTheme(t) {
   document.documentElement.dataset.theme = t;
@@ -554,6 +566,42 @@ let myName = localStorage.getItem('wp_name') || ('Guest' + Math.floor(Math.rando
 let myAvatar = localStorage.getItem('wp_avatar') || AVATARS[Math.floor(Math.random() * AVATARS.length)];
 localStorage.setItem('wp_name', myName);
 localStorage.setItem('wp_avatar', myAvatar);
+
+let members = [{ name: myName, avatar: myAvatar }];
+
+function renderMembers() {
+  membersList.innerHTML = '';
+  members.forEach(m => {
+    const row = document.createElement('div');
+    row.className = 'member-row';
+    const av = document.createElement('div');
+    av.className = 'avatar-bubble';
+    av.textContent = m.avatar || '💬';
+    av.style.background = colorFor(m.name);
+    row.appendChild(av);
+    const nameEl = document.createElement('span');
+    nameEl.textContent = m.name;
+    row.appendChild(nameEl);
+    membersList.appendChild(row);
+  });
+}
+function renderMembersIfOpen() {
+  if (membersModal.style.display === 'flex') renderMembers();
+}
+membersBtn.onclick = () => { renderMembers(); membersModal.style.display = 'flex'; };
+membersModal.onclick = e => { if (e.target === membersModal) membersModal.style.display = 'none'; };
+
+// host is the source of truth for who's connected; broadcasts the roster on every
+// join/leave so peers (who otherwise only see the host, not each other) stay in sync
+function broadcastMembers() {
+  if (!isHost) return;
+  const list = [{ name: myName, avatar: myAvatar }].concat(
+    conns.filter(c => c._name).map(c => ({ name: c._name, avatar: c._avatar }))
+  );
+  members = list;
+  conns.forEach(c => c.send({ type: 'members', list }));
+  renderMembersIfOpen();
+}
 
 function refreshAvatarBtn() {
   avatarBtn.textContent = myAvatar;
@@ -811,6 +859,10 @@ function handleIncoming(msg, fromConn) {
   } else if (msg.type === 'join') {
     if (fromConn) { fromConn._name = msg.name; fromConn._avatar = msg.avatar; }
     addSystem(msg.name, msg.avatar, 'joined the party 🎉');
+    broadcastMembers();
+  } else if (msg.type === 'members') {
+    members = msg.list;
+    renderMembersIfOpen();
   } else if (msg.type === 'sync') {
     if (msg.name) {
       if (msg.action === 'seek') addSystem(msg.name, msg.avatar, 'jumped to ' + formatTime(msg.time));
@@ -1076,6 +1128,7 @@ getIceServers().then(iceServers => {
       if (i > -1) conns.splice(i, 1);
       setStatus(conns.length + ' other viewer(s) connected');
       broadcastSystem(conn._name || 'someone', conn._avatar || '💬', 'left');
+      broadcastMembers();
     });
   });
 
