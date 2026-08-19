@@ -693,7 +693,7 @@ function openReactMenu(id, btn) {
   const r = btn.getBoundingClientRect();
   reactMenu.style.left = 'auto';
   reactMenu.style.right = (window.innerWidth - r.right) + 'px';
-  reactMenu.style.top = (r.top - 44) + 'px';
+  reactMenu.style.top = (r.bottom + 6) + 'px';
   reactMenu.style.display = 'flex';
 }
 document.addEventListener('click', e => {
