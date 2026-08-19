@@ -776,44 +776,73 @@ video.addEventListener('play', () => {
 });
 video.addEventListener('error', () => setStatus('could not load that video — check the URL allows direct/hotlink playback'));
 
-peer = new Peer(isHost ? roomId : undefined);
+// ponytail: STUN-only NAT traversal fails silently (no error, just hangs) whenever
+// either side is behind a restrictive/symmetric NAT — mobile data, school/office wifi,
+// some routers. A TURN relay fixes that. Get a free app + API key at metered.ca
+// (dashboard.metered.ca/signup?tool=turnserver) and fill both in below.
+const METERED_APP_NAME = 'YOUR_METERED_APP_NAME';
+const METERED_API_KEY = 'YOUR_METERED_API_KEY';
+const FALLBACK_ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' }
+];
 
-peer.on('open', () => {
-  if (isHost) {
-    shareLink.value = location.href;
-    shareBox.style.display = 'flex';
-    setStatus('room open — share the link above. waiting for others…');
-  } else {
-    setStatus('connecting to host…');
-    hostConn = peer.connect(roomId);
-    hostConn.on('open', () => {
-      setStatus('connected');
-      hostConn.send({ type: 'join', name: myName, avatar: myAvatar });
-      addSystem(myName, myAvatar, 'joined the party 🎉');
-    });
-    hostConn.on('data', msg => handleIncoming(msg));
-    hostConn.on('close', () => setStatus('lost connection to host'));
+async function getIceServers() {
+  try {
+    const res = await fetch('https://' + METERED_APP_NAME + '.metered.live/api/v1/turn/credentials?apiKey=' + METERED_API_KEY);
+    if (!res.ok) throw new Error('bad response');
+    const iceServers = await res.json();
+    if (!Array.isArray(iceServers) || !iceServers.length) throw new Error('empty response');
+    return iceServers;
+  } catch (e) {
+    return FALLBACK_ICE_SERVERS;
   }
-});
+}
 
-peer.on('connection', conn => {
-  conns.push(conn);
-  conn.on('open', () => {
-    conn.send({ type: 'state', url: video.src || null, time: video.currentTime, paused: video.paused, chat: chatHistory });
-    setStatus(conns.length + ' other viewer(s) connected');
-  });
-  conn.on('data', msg => handleIncoming(msg, conn));
-  conn.on('close', () => {
-    const i = conns.indexOf(conn);
-    if (i > -1) conns.splice(i, 1);
-    setStatus(conns.length + ' other viewer(s) connected');
-    broadcastSystem(conn._name || 'someone', conn._avatar || '💬', 'left');
-  });
-});
+getIceServers().then(iceServers => {
+  peer = new Peer(isHost ? roomId : undefined, { config: { iceServers } });
 
-peer.on('error', err => {
-  if (!isHost && err.type === 'peer-unavailable') setStatus('room not found — the host may be offline');
-  else setStatus('connection error: ' + err.type);
+  peer.on('open', () => {
+    if (isHost) {
+      shareLink.value = location.href;
+      shareBox.style.display = 'flex';
+      setStatus('room open — share the link above. waiting for others…');
+    } else {
+      setStatus('connecting to host…');
+      const stuckTimer = setTimeout(() => {
+        setStatus('still connecting — this can take longer on some networks. make sure the host\'s tab is still open.');
+      }, 12000);
+      hostConn = peer.connect(roomId);
+      hostConn.on('open', () => {
+        clearTimeout(stuckTimer);
+        setStatus('connected');
+        hostConn.send({ type: 'join', name: myName, avatar: myAvatar });
+        addSystem(myName, myAvatar, 'joined the party 🎉');
+      });
+      hostConn.on('data', msg => handleIncoming(msg));
+      hostConn.on('close', () => setStatus('lost connection to host'));
+    }
+  });
+
+  peer.on('connection', conn => {
+    conns.push(conn);
+    conn.on('open', () => {
+      conn.send({ type: 'state', url: video.src || null, time: video.currentTime, paused: video.paused, chat: chatHistory });
+      setStatus(conns.length + ' other viewer(s) connected');
+    });
+    conn.on('data', msg => handleIncoming(msg, conn));
+    conn.on('close', () => {
+      const i = conns.indexOf(conn);
+      if (i > -1) conns.splice(i, 1);
+      setStatus(conns.length + ' other viewer(s) connected');
+      broadcastSystem(conn._name || 'someone', conn._avatar || '💬', 'left');
+    });
+  });
+
+  peer.on('error', err => {
+    if (!isHost && err.type === 'peer-unavailable') setStatus('room not found — the host may be offline');
+    else setStatus('connection error: ' + err.type);
+  });
 });
 
 copyBtn.onclick = () => {
