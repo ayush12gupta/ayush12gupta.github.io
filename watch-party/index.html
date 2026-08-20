@@ -272,6 +272,7 @@
   .gif-results-msg { color: var(--muted); font-size: 0.85rem; grid-column: 1 / -1; }
   .gif-msg { max-width: 220px; border-radius: 0.6rem; display: block; margin-top: 0.2rem; }
   #chatLog { flex: 1; overflow-y: auto; margin-bottom: 0.6rem; padding-right: 0.2rem; }
+  .typing-indicator { display: none; font-size: 0.8rem; color: var(--muted); font-style: italic; padding: 0 0 0.4rem; }
   .msg { display: flex; gap: 0.6rem; align-items: flex-start; margin-bottom: 0.9rem; }
   .avatar-bubble {
     width: 2.1rem;
@@ -479,6 +480,7 @@
   <video id="video" controls></video>
   <div class="chat-col">
     <div id="chatLog"></div>
+    <div class="typing-indicator" id="typingIndicator"></div>
     <div class="emoji-picker-wrap" id="emojiPickerWrap">
       <emoji-picker></emoji-picker>
       <button id="heartToggleBtn" type="button" title="send a heart">💜</button>
@@ -539,6 +541,7 @@ const reactMenu = document.getElementById('reactMenu');
 const membersBtn = document.getElementById('membersBtn');
 const membersModal = document.getElementById('membersModal');
 const membersList = document.getElementById('membersList');
+const typingIndicator = document.getElementById('typingIndicator');
 
 function applyTheme(t) {
   document.documentElement.dataset.theme = t;
@@ -842,6 +845,37 @@ function relay(msg) {
   else if (hostConn) hostConn.send(msg);
 }
 
+const typingUsers = {}; // name -> expiry timeout id
+
+function renderTypingIndicator() {
+  const names = Object.keys(typingUsers);
+  if (!names.length) {
+    typingIndicator.style.display = 'none';
+    return;
+  }
+  typingIndicator.textContent = (names.length === 1 ? names[0] + ' is typing…' : names.join(', ') + ' are typing…');
+  typingIndicator.style.display = 'block';
+}
+
+function showTyping(name) {
+  if (typingUsers[name]) clearTimeout(typingUsers[name]);
+  typingUsers[name] = setTimeout(() => {
+    delete typingUsers[name];
+    renderTypingIndicator();
+  }, 3000);
+  renderTypingIndicator();
+}
+
+// ponytail: throttled to ~1 ping per 2s of continuous typing, not per keystroke —
+// keeps this cheap on the TURN relay quota instead of flooding it.
+let typingThrottled = false;
+chatInput.addEventListener('input', () => {
+  if (typingThrottled) return;
+  typingThrottled = true;
+  relay({ type: 'typing', name: myName });
+  setTimeout(() => { typingThrottled = false; }, 2000);
+});
+
 function addSystem(name, avatar, text) {
   const msg = { type: 'system', name, avatar, text };
   chatHistory.push(msg);
@@ -855,6 +889,11 @@ function broadcastSystem(name, avatar, text) {
 
 function handleIncoming(msg, fromConn) {
   if (msg.type === 'chat' || msg.type === 'system') {
+    if (msg.name && typingUsers[msg.name]) {
+      clearTimeout(typingUsers[msg.name]);
+      delete typingUsers[msg.name];
+      renderTypingIndicator();
+    }
     chatHistory.push(msg);
     renderChat(msg);
   } else if (msg.type === 'join') {
@@ -878,6 +917,8 @@ function handleIncoming(msg, fromConn) {
     if (msg.name) addSystem(msg.name, msg.avatar, 'loaded a new video');
   } else if (msg.type === 'reaction') {
     applyReaction(msg.targetId, msg.emoji, msg.name);
+  } else if (msg.type === 'typing') {
+    showTyping(msg.name);
   } else if (msg.type === 'state') {
     if (msg.url) { video.src = msg.url; video.currentTime = msg.time; if (!msg.paused) video.play(); }
     chatHistory = msg.chat || [];
