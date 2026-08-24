@@ -50,7 +50,7 @@
     color: var(--text);
     border: 2px solid var(--border);
   }
-  #membersBtn, #avatarBtn {
+  #dinoBtn, #membersBtn, #avatarBtn {
     background: var(--input-bg);
     border: 2px solid var(--border);
     border-radius: 50%;
@@ -102,6 +102,7 @@
     0%, 49.9% { transform: rotate(0deg) translateY(0); }
     50%, 100% { transform: rotate(-18deg) translateY(-3px); }
   }
+  html.dino-off .dino { display: none !important; }
   .wrap { padding: 0 1.5rem; }
   .main-col { max-width: 900px; }
   .card {
@@ -476,6 +477,7 @@
 <body>
 <header>
   <div class="header-right">
+    <button id="dinoBtn" title="toggle running dino">🦖</button>
     <button id="membersBtn" title="who's here">👥</button>
     <button id="avatarBtn" title="change name/avatar"></button>
     <button id="themeBtn">light mode</button>
@@ -588,6 +590,10 @@ const replyPreviewText = document.getElementById('replyPreviewText');
 const cancelReplyBtn = document.getElementById('cancelReplyBtn');
 const reactMenu = document.getElementById('reactMenu');
 const membersBtn = document.getElementById('membersBtn');
+const dinoBtn = document.getElementById('dinoBtn');
+const dino = document.querySelector('.dino');
+const dinoHomeParent = dino.parentNode;
+const dinoHomeNext = dino.nextSibling;
 const membersModal = document.getElementById('membersModal');
 const membersList = document.getElementById('membersList');
 const typingIndicator = document.getElementById('typingIndicator');
@@ -609,7 +615,23 @@ theaterBtn.onclick = () => {
 };
 document.addEventListener('fullscreenchange', () => {
   theaterBtn.textContent = document.fullscreenElement ? 'exit theater mode' : '🎬 theater mode';
+  // move the same dino node into #theater while fullscreen (outside it, it wouldn't
+  // render at all — the Fullscreen API only paints the fullscreen element's subtree)
+  if (document.fullscreenElement) theater.appendChild(dino);
+  else dinoHomeParent.insertBefore(dino, dinoHomeNext);
 });
+
+let dinoOn = localStorage.getItem('wp_dino') !== 'off';
+function applyDinoToggle() {
+  document.documentElement.classList.toggle('dino-off', !dinoOn);
+  dinoBtn.style.opacity = dinoOn ? '1' : '0.4';
+}
+applyDinoToggle();
+dinoBtn.onclick = () => {
+  dinoOn = !dinoOn;
+  localStorage.setItem('wp_dino', dinoOn ? 'on' : 'off');
+  applyDinoToggle();
+};
 
 const AVATARS = ['🐱', '🐶', '🦊', '🐼', '🐨', '🦁', '🐵', '🐰', '🦄', '🐯', '🐹', '🐷', '🐸', '🐙', '🦖'];
 const HEARTS = ['💜', '❤️', '🧡', '💚', '💙', '🩷', '🤍', '🤎'];
