@@ -67,16 +67,41 @@
   .dino {
     position: fixed;
     top: 3.6rem;
-    left: -60px;
+    left: 60px;
     width: 52px;
     height: 40px;
+    z-index: 6;
+    pointer-events: none;
+    animation: dino-jump 2.1s ease-in-out infinite;
+  }
+  @keyframes dino-jump {
+    0%, 24%, 100% { transform: translateY(0); }
+    12% { transform: translateY(-24px); }
+  }
+  .tree {
+    position: fixed;
+    top: 4.4rem;
+    left: 100vw;
+    width: 16px;
+    height: 24px;
     z-index: 5;
     pointer-events: none;
-    animation: dino-run-across 9s linear infinite;
+    animation: tree-scroll linear infinite;
   }
-  @keyframes dino-run-across {
-    from { left: -60px; }
-    to { left: 100vw; }
+  .tree .leaves {
+    position: absolute;
+    left: 0; top: 0; width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 8px 16px 8px;
+    border-color: transparent transparent #2f7d3a transparent;
+  }
+  .tree .trunk { position: absolute; left: 6px; top: 14px; width: 4px; height: 10px; background: #6b4a2f; }
+  .tree1 { animation-duration: 3.4s; animation-delay: 0s; }
+  .tree2 { animation-duration: 4.6s; animation-delay: 1.6s; }
+  .tree3 { animation-duration: 3.9s; animation-delay: 3s; }
+  @keyframes tree-scroll {
+    from { left: 100vw; }
+    to { left: -20px; }
   }
   .dino div { position: absolute; background: #4d9e3f; }
   .dino .tail {
@@ -492,6 +517,9 @@
   <div class="leg1"></div>
   <div class="leg2"></div>
 </div>
+<div class="tree tree1" aria-hidden="true"><div class="leaves"></div><div class="trunk"></div></div>
+<div class="tree tree2" aria-hidden="true"><div class="leaves"></div><div class="trunk"></div></div>
+<div class="tree tree3" aria-hidden="true"><div class="leaves"></div><div class="trunk"></div></div>
 <div class="modal-overlay" id="profileModal">
   <div class="modal-card">
     <h2>your name &amp; avatar</h2>
