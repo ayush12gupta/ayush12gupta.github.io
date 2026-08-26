@@ -177,8 +177,16 @@
   }
   #hideChatBtn { flex: 1; }
   .theater:fullscreen .chat-toolbar, .theater:-webkit-full-screen .chat-toolbar { display: flex; }
-  .show-chat-btn {
+  .chat-peek-zone {
     display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 110px;
+    z-index: 14;
+  }
+  .show-chat-btn {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -191,8 +199,8 @@
     transition: opacity 0.2s;
   }
   #theater.chat-hidden .chat-col { display: none; }
-  #theater.chat-hidden .show-chat-btn { display: block; }
-  #theater.chat-hidden .video-wrap:hover .show-chat-btn { opacity: 1; pointer-events: auto; }
+  #theater.chat-hidden .chat-peek-zone { display: block; }
+  .chat-peek-zone:hover .show-chat-btn { opacity: 1; pointer-events: auto; }
   .chat-col {
     position: relative;
     flex: 1 1 260px;
@@ -570,7 +578,9 @@
 <div class="theater" id="theater">
   <div class="video-wrap" id="videoWrap">
     <video id="video" controls></video>
-    <button id="showChatBtn" class="show-chat-btn" type="button">💬 show chat</button>
+    <div class="chat-peek-zone" id="chatPeekZone">
+      <button id="showChatBtn" class="show-chat-btn" type="button">💬 show chat</button>
+    </div>
   </div>
   <div class="chat-col">
     <div class="chat-toolbar" id="chatToolbar">
@@ -751,6 +761,8 @@ function broadcastMembers() {
 function refreshAvatarBtn() {
   avatarBtn.textContent = myAvatar;
   avatarBtn.style.background = colorFor(myName);
+  theaterProfileBtn.textContent = myAvatar;
+  theaterProfileBtn.style.background = colorFor(myName);
 }
 refreshAvatarBtn();
 AVATARS.forEach(a => {
