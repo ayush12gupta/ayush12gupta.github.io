@@ -587,6 +587,7 @@
       <button id="hideChatBtn" type="button" title="hide chat">✕ hide chat</button>
       <button id="theaterMembersBtn" type="button" title="who's here">👥</button>
       <button id="theaterProfileBtn" type="button" title="edit profile">✏️</button>
+      <button id="theaterDinoBtn" type="button" title="toggle running dino">🦖</button>
     </div>
     <div id="chatLog"></div>
     <div class="typing-indicator" id="typingIndicator"></div>
@@ -657,6 +658,7 @@ const showChatBtn = document.getElementById('showChatBtn');
 const hideChatBtn = document.getElementById('hideChatBtn');
 const theaterMembersBtn = document.getElementById('theaterMembersBtn');
 const theaterProfileBtn = document.getElementById('theaterProfileBtn');
+const theaterDinoBtn = document.getElementById('theaterDinoBtn');
 
 function applyTheme(t) {
   document.documentElement.dataset.theme = t;
@@ -701,11 +703,13 @@ hideChatBtn.onclick = () => theater.classList.add('chat-hidden');
 showChatBtn.onclick = () => theater.classList.remove('chat-hidden');
 theaterMembersBtn.onclick = () => membersBtn.click();
 theaterProfileBtn.onclick = () => avatarBtn.click();
+theaterDinoBtn.onclick = () => dinoBtn.click();
 
 let dinoOn = localStorage.getItem('wp_dino') !== 'off';
 function applyDinoToggle() {
   document.documentElement.classList.toggle('dino-off', !dinoOn);
   dinoBtn.style.opacity = dinoOn ? '1' : '0.4';
+  theaterDinoBtn.style.opacity = dinoOn ? '1' : '0.4';
 }
 applyDinoToggle();
 dinoBtn.onclick = () => {
