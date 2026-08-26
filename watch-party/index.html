@@ -147,14 +147,52 @@
     padding: 0 1.5rem 1.5rem;
     align-items: flex-start;
   }
-  video {
+  .video-wrap {
+    position: relative;
     flex: 3 1 480px;
     min-width: 300px;
     width: 100%;
+  }
+  .video-wrap video {
+    width: 100%;
+    height: 100%;
     border-radius: 0.8rem;
     background: #000;
     display: block;
   }
+  .chat-toolbar {
+    display: none;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+  .chat-toolbar button {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.4rem;
+    width: auto;
+    height: auto;
+  }
+  #hideChatBtn { flex: 1; }
+  .theater:fullscreen .chat-toolbar, .theater:-webkit-full-screen .chat-toolbar { display: flex; }
+  .show-chat-btn {
+    display: none;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 15;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  #theater.chat-hidden .chat-col { display: none; }
+  #theater.chat-hidden .show-chat-btn { display: block; }
+  #theater.chat-hidden .video-wrap:hover .show-chat-btn { opacity: 1; pointer-events: auto; }
   .chat-col {
     position: relative;
     flex: 1 1 260px;
@@ -460,11 +498,13 @@
     height: 100vh;
     flex-wrap: nowrap;
   }
-  .theater:fullscreen video, .theater:-webkit-full-screen video {
+  .theater:fullscreen .video-wrap, .theater:-webkit-full-screen .video-wrap {
     flex: 1 1 auto;
     height: 100vh;
-    border-radius: 0;
     min-width: 0;
+  }
+  .theater:fullscreen .video-wrap video, .theater:-webkit-full-screen .video-wrap video {
+    border-radius: 0;
   }
   .theater:fullscreen .chat-col, .theater:-webkit-full-screen .chat-col {
     flex: 0 0 300px;
@@ -528,8 +568,16 @@
   </div>
 </div>
 <div class="theater" id="theater">
-  <video id="video" controls></video>
+  <div class="video-wrap" id="videoWrap">
+    <video id="video" controls></video>
+    <button id="showChatBtn" class="show-chat-btn" type="button">💬 show chat</button>
+  </div>
   <div class="chat-col">
+    <div class="chat-toolbar" id="chatToolbar">
+      <button id="hideChatBtn" type="button" title="hide chat">✕ hide chat</button>
+      <button id="theaterMembersBtn" type="button" title="who's here">👥</button>
+      <button id="theaterProfileBtn" type="button" title="edit profile">✏️</button>
+    </div>
     <div id="chatLog"></div>
     <div class="typing-indicator" id="typingIndicator"></div>
     <div class="emoji-picker-wrap" id="emojiPickerWrap">
@@ -592,11 +640,13 @@ const reactMenu = document.getElementById('reactMenu');
 const membersBtn = document.getElementById('membersBtn');
 const dinoBtn = document.getElementById('dinoBtn');
 const dino = document.querySelector('.dino');
-const dinoHomeParent = dino.parentNode;
-const dinoHomeNext = dino.nextSibling;
 const membersModal = document.getElementById('membersModal');
 const membersList = document.getElementById('membersList');
 const typingIndicator = document.getElementById('typingIndicator');
+const showChatBtn = document.getElementById('showChatBtn');
+const hideChatBtn = document.getElementById('hideChatBtn');
+const theaterMembersBtn = document.getElementById('theaterMembersBtn');
+const theaterProfileBtn = document.getElementById('theaterProfileBtn');
 
 function applyTheme(t) {
   document.documentElement.dataset.theme = t;
@@ -613,13 +663,34 @@ theaterBtn.onclick = () => {
   if (document.fullscreenElement) document.exitFullscreen();
   else theater.requestFullscreen();
 };
+
+// elements outside #theater don't render at all while it's fullscreen — the
+// Fullscreen API only paints the fullscreen element's own subtree — so anything
+// that needs to stay reachable in theater mode gets physically moved in and back out.
+function makeFullscreenPortal(el) {
+  const homeParent = el.parentNode;
+  const homeNext = el.nextSibling;
+  return {
+    toTheater: () => theater.appendChild(el),
+    toHome: () => homeParent.insertBefore(el, homeNext)
+  };
+}
+const fullscreenPortals = [makeFullscreenPortal(dino), makeFullscreenPortal(profileModal), makeFullscreenPortal(membersModal)];
+
 document.addEventListener('fullscreenchange', () => {
   theaterBtn.textContent = document.fullscreenElement ? 'exit theater mode' : '🎬 theater mode';
-  // move the same dino node into #theater while fullscreen (outside it, it wouldn't
-  // render at all — the Fullscreen API only paints the fullscreen element's subtree)
-  if (document.fullscreenElement) theater.appendChild(dino);
-  else dinoHomeParent.insertBefore(dino, dinoHomeNext);
+  if (document.fullscreenElement) {
+    fullscreenPortals.forEach(p => p.toTheater());
+  } else {
+    fullscreenPortals.forEach(p => p.toHome());
+    theater.classList.remove('chat-hidden');
+  }
 });
+
+hideChatBtn.onclick = () => theater.classList.add('chat-hidden');
+showChatBtn.onclick = () => theater.classList.remove('chat-hidden');
+theaterMembersBtn.onclick = () => membersBtn.click();
+theaterProfileBtn.onclick = () => avatarBtn.click();
 
 let dinoOn = localStorage.getItem('wp_dino') !== 'off';
 function applyDinoToggle() {
