@@ -526,6 +526,18 @@
     border-radius: 0;
     box-shadow: none;
   }
+  /* keep the dino clear of the 300px chat column while it's actually visible */
+  .theater:fullscreen .dino, .theater:-webkit-full-screen .dino {
+    animation: dino-run-theater 18s linear infinite, dino-face 18s steps(1) infinite;
+  }
+  @keyframes dino-run-theater {
+    0% { left: 0; }
+    50% { left: calc(100vw - 300px - 52px); }
+    100% { left: 0; }
+  }
+  #theater.chat-hidden .dino {
+    animation: dino-run-across 18s linear infinite, dino-face 18s steps(1) infinite;
+  }
 </style>
 </head>
 <body>
