@@ -77,10 +77,11 @@
   }
   /* purple starts partway into the same cycle — near the walls the gap closes and
      whoever reaches the edge first flips first, swapping who's "leading" for free */
-  /* slightly different lap durations (not a fixed delay) so their relative phase
-     continuously drifts — the lead slowly swaps back and forth over minutes instead
-     of being locked to one dino or snapping on a fixed schedule */
-  .dino.dino-green { animation-duration: 20s, 20s; --dino-color: #4d9e3f; }
+  /* fixed small time-gap — same speed/direction at all times (real chasing look),
+     at the cost of the same dino always winning the overall lead long-term. Every
+     attempt at also swapping the overall winner either desyncs their direction
+     (looks like independent laps) or introduces a jump/wobble at the wall. */
+  .dino.dino-green { animation-delay: -1s; --dino-color: #4d9e3f; }
   .dino.dino-purple { --dino-color: #8b5cf6; }
   @keyframes dino-run-across {
     0% { left: 0; }
