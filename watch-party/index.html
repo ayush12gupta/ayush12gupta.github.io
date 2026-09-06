@@ -729,6 +729,7 @@ theaterDinoBtn.onclick = () => dinoBtn.click();
 
 let dinoOn = localStorage.getItem('wp_dino') !== 'off';
 function applyDinoToggle() {
+  localStorage.setItem('wp_dino', dinoOn ? 'on' : 'off');
   document.documentElement.classList.toggle('dino-off', !dinoOn);
   dinoBtn.style.opacity = dinoOn ? '1' : '0.4';
   theaterDinoBtn.style.opacity = dinoOn ? '1' : '0.4';
@@ -736,8 +737,8 @@ function applyDinoToggle() {
 applyDinoToggle();
 dinoBtn.onclick = () => {
   dinoOn = !dinoOn;
-  localStorage.setItem('wp_dino', dinoOn ? 'on' : 'off');
   applyDinoToggle();
+  relay({ type: 'dino', on: dinoOn });
 };
 
 const AVATARS = ['🐱', '🐶', '🦊', '🐼', '🐨', '🦁', '🐵', '🐰', '🦄', '🐯', '🐹', '🐷', '🐸', '🐙', '🦖'];
@@ -1099,6 +1100,9 @@ function handleIncoming(msg, fromConn) {
     applyReaction(msg.targetId, msg.emoji, msg.name);
   } else if (msg.type === 'typing') {
     showTyping(msg.name);
+  } else if (msg.type === 'dino') {
+    dinoOn = msg.on;
+    applyDinoToggle();
   } else if (msg.type === 'state') {
     if (msg.url) { video.src = msg.url; video.currentTime = msg.time; if (!msg.paused) video.play(); }
     chatHistory = msg.chat || [];
@@ -1114,6 +1118,10 @@ function handleIncoming(msg, fromConn) {
       Object.keys(incoming[id]).forEach(emoji => { reactions[id][emoji] = new Set(incoming[id][emoji]); });
       renderReactions(id);
     });
+    if (typeof msg.dinoOn === 'boolean') {
+      dinoOn = msg.dinoOn;
+      applyDinoToggle();
+    }
   }
   if (isHost && fromConn) conns.forEach(c => { if (c !== fromConn) c.send(msg); });
 }
@@ -1341,7 +1349,7 @@ getIceServers().then(iceServers => {
   peer.on('connection', conn => {
     conns.push(conn);
     conn.on('open', () => {
-      conn.send({ type: 'state', url: video.src || null, time: video.currentTime, paused: video.paused, chat: chatHistory, reactions: serializeReactions() });
+      conn.send({ type: 'state', url: video.src || null, time: video.currentTime, paused: video.paused, chat: chatHistory, reactions: serializeReactions(), dinoOn });
       setStatus(conns.length + ' other viewer(s) connected');
     });
     conn.on('data', msg => handleIncoming(msg, conn));
