@@ -66,7 +66,6 @@
   h1 { margin: 0.2rem 0 0.8rem; color: var(--accent-strong); font-size: 1.5rem; }
   .dino {
     --dino-right-limit: calc(100vw - 52px);
-    --dino-color: #4d9e3f;
     position: fixed;
     bottom: 0.5rem;
     left: 0;
@@ -74,8 +73,13 @@
     height: 40px;
     z-index: 5;
     pointer-events: none;
-    animation: dino-run-across 18s linear infinite, dino-face 18s steps(1) infinite, dino-color 18s steps(1) infinite;
+    animation: dino-run-across 18s linear infinite, dino-face 18s steps(1) infinite;
   }
+  /* purple starts partway into the same cycle — near the walls the gap closes and
+     whoever reaches the edge first flips first, swapping who's "leading" for free */
+  .dino.dino-purple { animation-delay: -0.6s; }
+  .dino.dino-green { --dino-color: #4d9e3f; }
+  .dino.dino-purple { --dino-color: #8b5cf6; }
   @keyframes dino-run-across {
     0% { left: 0; }
     50% { left: var(--dino-right-limit); }
@@ -85,11 +89,6 @@
     0%, 49.9% { transform: scaleX(1); }
     50%, 99.9% { transform: scaleX(-1); }
     100% { transform: scaleX(1); }
-  }
-  @keyframes dino-color {
-    0%, 49.9% { --dino-color: #4d9e3f; }
-    50%, 99.9% { --dino-color: #8b5cf6; }
-    100% { --dino-color: #4d9e3f; }
   }
   .dino div { position: absolute; background: var(--dino-color); }
   .dino .tail {
@@ -553,7 +552,18 @@
     <button id="themeBtn">light mode</button>
   </div>
 </header>
-<div class="dino" aria-hidden="true">
+<div class="dino dino-green" aria-hidden="true">
+  <div class="tail"></div>
+  <div class="body"></div>
+  <div class="neck"></div>
+  <div class="head"></div>
+  <div class="jaw"></div>
+  <div class="eye"></div>
+  <div class="arm"></div>
+  <div class="leg1"></div>
+  <div class="leg2"></div>
+</div>
+<div class="dino dino-purple" aria-hidden="true">
   <div class="tail"></div>
   <div class="body"></div>
   <div class="neck"></div>
@@ -672,7 +682,7 @@ const cancelReplyBtn = document.getElementById('cancelReplyBtn');
 const reactMenu = document.getElementById('reactMenu');
 const membersBtn = document.getElementById('membersBtn');
 const dinoBtn = document.getElementById('dinoBtn');
-const dino = document.querySelector('.dino');
+const dinos = document.querySelectorAll('.dino');
 const membersModal = document.getElementById('membersModal');
 const membersList = document.getElementById('membersList');
 const typingIndicator = document.getElementById('typingIndicator');
@@ -709,7 +719,7 @@ function makeFullscreenPortal(el) {
     toHome: () => homeParent.insertBefore(el, homeNext)
   };
 }
-const fullscreenPortals = [makeFullscreenPortal(dino), makeFullscreenPortal(profileModal), makeFullscreenPortal(membersModal)];
+const fullscreenPortals = [...Array.from(dinos).map(makeFullscreenPortal), makeFullscreenPortal(profileModal), makeFullscreenPortal(membersModal)];
 
 document.addEventListener('fullscreenchange', () => {
   theaterBtn.textContent = document.fullscreenElement ? 'exit theater mode' : '🎬 theater mode';
